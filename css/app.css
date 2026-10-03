@@ -70,10 +70,13 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .saisie { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .saisie.fige { pointer-events: none; opacity: .6; }
 .retour { min-height: 0; display: flex; justify-content: center; }
-.bulle { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 110px; height: 110px; border-radius: 50%;
-  display: grid; place-items: center; background: #fff; box-shadow: var(--ombre); font-size: 64px; font-weight: 800; animation: pop .35s ease-out; }
+/* Bulle de retour : en haut à droite, sous l'oreille, jamais sur la zone de saisie ; disparaît seule. */
+.bulle { position: fixed; top: calc(env(safe-area-inset-top) + 72px); right: 16px; width: 72px; height: 72px; border-radius: 50%;
+  display: grid; place-items: center; background: #fff; box-shadow: var(--ombre); font-size: 44px; font-weight: 800;
+  pointer-events: none; animation: pop .35s ease-out, disparait .4s ease-in 1.3s forwards; }
+@keyframes disparait { to { opacity: 0; transform: scale(.8); } }
 .bulle-verifie { color: var(--orange); }
-@keyframes pop { from { transform: translate(-50%, -50%) scale(.5); opacity: 0; } }
+@keyframes pop { from { transform: scale(.5); opacity: 0; } }
 .grand-texte { font-size: 52px; font-weight: 800; letter-spacing: 1px; text-align: center; line-height: 1.1; }
 .trou { display: inline-block; min-width: 54px; border-bottom: 5px solid var(--orange); color: var(--orange); }
 .illustration { display: flex; gap: 8px; }

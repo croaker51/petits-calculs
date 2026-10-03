@@ -209,6 +209,7 @@ async function valider() {
   if (session.essais.length === 1) {
     // 1er échec : « Vérifie », sans indice de réponse (règle B4).
     $('#retour').innerHTML = `<div class="bulle bulle-verifie">?</div>`;
+    setTimeout(() => { const r = $('#retour'); if (r) r.innerHTML = ''; }, 1800);
     session.reinitialiser();
     session.tFinConsigne = null;
     session.tDebut = performance.now();

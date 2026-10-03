@@ -2,6 +2,10 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.2.2 — 2026-10-03
+- Correctif : l'étoile / le « ? » de retour ne masquent plus la zone de saisie (déplacés en haut à droite, disparition automatique).
+- Correctif : l'export iPhone ne crée plus de fichier texte parasite en plus du JSON.
+
 ## 0.2.1 — 2026-10-03
 - Voix : 49 phrases en voix clonée (MimikaStudio, Qwen3-TTS 1.7B), contrôlées par transcription automatique (tous les nombres conformes).
 - Outils : importer_audio.py, generer_voix_mimika.py (+ .command), verifier_audio.py.

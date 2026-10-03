@@ -231,7 +231,7 @@ async function exporter() {
   try {
     // iPhone : feuille de partage → « Enregistrer dans Fichiers » → iCloud Drive.
     if (navigator.canShare && navigator.canShare({ files: [fichier] })) {
-      await navigator.share({ files: [fichier], title: nom });
+      await navigator.share({ files: [fichier] }); // sans titre : sinon iOS enregistre aussi un fichier texte
       S.journaliser('export', { fichier: nom });
       msg.textContent = 'Export prêt : ' + nom;
       return;
