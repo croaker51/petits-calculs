@@ -94,7 +94,10 @@ function afficherItem(index) {
     ${session.config.neSaisPas ? `<div class="zone-nsp" id="zone-nsp" hidden>${boutonNeSaisPas()}</div>` : ''}
     <div class="retour" id="retour"></div>`, 'ecran-item fond-' + session.profil.avatar);
   $('#pause').onclick = mettreEnPause;
-  $('#ecouter').onclick = () => reecouter();
+  // L'oreille redit TOUJOURS la consigne de l'item (avant : elle redisait la dernière phrase
+  // entendue, donc seulement « Vérifie » après une 1re erreur — bug signalé par Simon, v0.3.1).
+  session.aEcouter = [it.consigne || it.id + '_c'];
+  $('#ecouter').onclick = () => { if (session) dire(session.aEcouter); };
   construireSaisie(it);
   if (session.config.neSaisPas) $('#neSaisPas').onclick = neSaisPas;
   session.tFinConsigne = null;
@@ -273,6 +276,7 @@ function montrerAide(reponse, phraseIntro) {
   const z = $('#zone-nsp'); if (z) z.hidden = true;
   $('#retour').innerHTML = '';
   $('#suite').onclick = () => { arreter(); itemSuivant(); };
+  session.aEcouter = [it.explication || it.id + '_e', 'suivant']; // pendant l'aide : l'oreille redit l'explication
   dire([phraseIntro, it.explication || it.id + '_e', 'suivant']);
 }
 

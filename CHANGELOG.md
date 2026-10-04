@@ -2,6 +2,9 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.3.1 — 2026-10-04
+- Correctif : l'oreille redit la consigne de l'exercice à tout moment, y compris après une 1re erreur (elle ne redisait que « Vérifie »). Pendant l'aide, elle redit l'explication.
+
 ## 0.3.0 — 2026-10-04
 - Séances d'entraînement : 2 parcours (C « Décomposer et compléter », N « Nombres jusqu'à 100 et problèmes ») de 5 séances × 15 exercices, choisis par enfant dans l'espace parent ; enchaînement automatique, pause et reprise.
 - Moteur commun au test et aux séances (deroule.js) ; le test reste identique.
