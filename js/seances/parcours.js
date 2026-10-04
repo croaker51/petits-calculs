@@ -18,7 +18,7 @@ import {
   suiteATrou, dictee, calculAmi, ligneAide, illustration, de, deuxDes, droiteGraduee
 } from '../rendu.js';
 
-export const VERSION_SEANCES = 'S1.2'; // S1.0 : séances 1-3 ; S1.1 : + séances 4-5 ; S1.2 : additions de dizaines du parcours N reprises avec les barres
+export const VERSION_SEANCES = 'S1.3'; // S1.0 : séances 1-3 ; S1.1 : + séances 4-5 ; S1.2 : additions de dizaines du parcours N reprises avec les barres ; S1.3 : parcours C, terme manquant en 1re position, presque-doubles, signe moins
 
 // ---------- Fabriques (la vérification est toujours une égalité stricte, ou une tolérance pour la ligne) ----------
 const pave = o => ({ type: 'pave', verifier: r => r === o.attendu, ...o });
@@ -114,16 +114,17 @@ const C2 = [
     scene: () => boiteDe10(7), aide: () => boiteDe10(7, 3) + grand('7 + 3 = 10') }),
   pave({ id: 'c2_03', domaine: 'Décomposition', libelle: 'Il en faut 8, il y en a 5 (cases vides visibles) — reprise de i10', attendu: 3,
     scene: () => emplacements('etoile', 5, 8, 36), aide: () => deuxGroupes('etoile', 5, 3) + grand('8 = 5 + 3') }),
-  pave({ id: 'c2_04', domaine: 'Dizaines / unités', libelle: 'Lire 5 barres + 2 cubes (52)', attendu: 52,
-    scene: () => barresCubes(5, 2), aide: () => barresCubes(5, 2, true) + grand('52') }),
+  // S1.3 : terme manquant en PREMIÈRE position (erreur du cahier d'école : « __ + 3 = 5 » → 8).
+  pave({ id: 'c2_04', domaine: 'Décomposition', libelle: 'Dés : ? + 3 = 5 (dé caché en premier)', attendu: 2,
+    scene: () => deuxDes(null, 3), aide: () => deuxDes(2, 3) + grand('2 + 3 = 5') }),
   pave({ id: 'c2_05', domaine: 'Compléments à 10', libelle: '4 + ? = 10 (boîte de 10 visible)', attendu: 6,
     scene: () => grand(`4 + ${TROU} = 10`) + boiteDe10(4), aide: () => boiteDe10(4, 6) + grand('4 + 6 = 10') }),
   pave({ id: 'c2_06', domaine: 'Décomposition', libelle: '5 + ? = 9 (objets visibles)', attendu: 4,
     scene: () => grand(`5 + ${TROU} = 9`) + rangee('bille', 5, 40), aide: () => deuxGroupes('bille', 5, 4) + grand('5 + 4 = 9') }),
-  pave({ id: 'c2_07', domaine: 'Suite des nombres', libelle: 'Après 88, 89, 90 : écrire 91', attendu: 91,
-    scene: () => suiteATrou([88, 89, 90]), aide: () => bande(87, 93, 91) + barresCubes(9, 1) + grand('91') }),
-  pave({ id: 'c2_08', domaine: 'Calcul', libelle: '3 + 4', attendu: 7,
-    scene: () => grand(`3 + 4 = ${TROU}`), aide: () => grand('3 + 4 = 7') + deuxGroupes('point', 3, 4, 26) }),
+  pave({ id: 'c2_07', domaine: 'Décomposition', libelle: 'Dés : ? + 1 = 3 (dé caché en premier)', attendu: 2,
+    scene: () => grand(`${TROU} + 1 = 3`) + deuxDes(null, 1, 64), aide: () => deuxDes(2, 1) + grand('2 + 1 = 3') }),
+  pave({ id: 'c2_08', domaine: 'Calcul', libelle: '4 + 5 (presque-double)', attendu: 9,
+    scene: () => grand(`4 + 5 = ${TROU}`), aide: () => deuxDes(4, 5) + grand('4 + 4 = 8') + grand('4 + 5 = 9') }),
   construire('c2_09', 43),
   pave({ id: 'c2_10', domaine: 'Problème (retrait)', libelle: '8 cartes, Tom en prend 3', attendu: 5,
     scene: () => illustration('carte', 2, 70), aide: () => rangee('carte', 8, 30, 3) + grand('8 − 3 = 5') }),
@@ -144,17 +145,18 @@ const C3 = [
     scene: () => grand(`5 + ${TROU} = 10`) + boiteDe10(5), aide: () => boiteDe10(5, 5) + grand('5 + 5 = 10') }),
   pave({ id: 'c3_02', domaine: 'Décomposition', libelle: '8 = 5 + ? sans support (reprise de i10)', attendu: 3,
     scene: () => grand(`8 = 5 + ${TROU}`), aide: () => emplacements('point', 5, 8, 30) + grand('8 = 5 + 3') }),
-  pave({ id: 'c3_03', domaine: 'Dizaines / unités', libelle: 'Lire 6 barres + 0 cube (60)', attendu: 60,
-    scene: () => barresCubes(6, 0), aide: () => barresCubes(6, 0, true) + grand('60') }),
+  pave({ id: 'c3_03', domaine: 'Décomposition', libelle: '? + 3 = 5 sans support (terme manquant en premier)', attendu: 2,
+    scene: () => grand(`${TROU} + 3 = 5`), aide: () => deuxDes(2, 3) + grand('2 + 3 = 5') }),
   pave({ id: 'c3_04', domaine: 'Décomposition', libelle: '9 = 7 + ? sans support', attendu: 2,
     scene: () => grand(`9 = 7 + ${TROU}`), aide: () => emplacements('point', 7, 9, 28) + grand('9 = 7 + 2') }),
-  pave({ id: 'c3_05', domaine: 'Écriture des nombres', libelle: 'Dictée : 95 (erreur « 910 » au test)', attendu: 95,
-    scene: () => dictee(), aide: () => barresCubes(9, 5, true) + grand('95') }),
-  pave({ id: 'c3_06', domaine: 'Calcul', libelle: '6 + 2', attendu: 8,
-    scene: () => grand(`6 + 2 = ${TROU}`), aide: () => grand('6 + 2 = 8') + deuxGroupes('point', 6, 2, 26) }),
+  pave({ id: 'c3_05', domaine: 'Décomposition', libelle: '? + 2 = 6 sans support (terme manquant en premier)', attendu: 4,
+    scene: () => grand(`${TROU} + 2 = 6`), aide: () => emplacements('point', 2, 6, 30) + grand('4 + 2 = 6') }),
+  pave({ id: 'c3_06', domaine: 'Calcul', libelle: '5 + 4 (même résultat que 4 + 5)', attendu: 9,
+    scene: () => grand(`5 + 4 = ${TROU}`), aide: () => deuxDes(5, 4) + grand('5 + 4 = 4 + 5 = 9') }),
   pave({ id: 'c3_07', domaine: 'Problème (complément)', libelle: 'Léa veut 10 étoiles, elle en a 7', attendu: 3,
     scene: () => illustration('etoile', 1, 110), aide: () => boiteDe10(7, 3) + grand('7 + 3 = 10') }),
-  construire('c3_08', 38),
+  pave({ id: 'c3_08', domaine: 'Calcul', libelle: '8 − 2 (attention au signe moins)', attendu: 6,
+    scene: () => grand(`8 <span class="signe-fort">−</span> 2 = ${TROU}`), aide: () => rangee('point', 8, 26, 2) + grand('8 − 2 = 6') }),
   pave({ id: 'c3_09', domaine: 'Décomposition', libelle: '7 = 3 + ? sans support', attendu: 4,
     scene: () => grand(`7 = 3 + ${TROU}`), aide: () => emplacements('point', 3, 7, 30) + grand('7 = 3 + 4') }),
   choix({ id: 'c3_10', domaine: 'Comparaison', libelle: 'Le plus grand entre 69 et 96', choix: [69, 96], attendu: 96,

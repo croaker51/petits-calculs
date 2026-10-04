@@ -273,3 +273,5 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .addition-bc { gap: 4px; }
 .addition-bc .dizaines-unites { min-height: 0; }
 .ecran-item .scene .addition-bc { transform: scale(.88); transform-origin: top center; margin-bottom: -14px; }
+/* S1.3 : signe moins mis en évidence */
+.signe-fort { color: var(--rouge-doux); }

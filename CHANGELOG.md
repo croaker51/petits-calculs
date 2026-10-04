@@ -2,6 +2,10 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.3.3 — 2026-10-04
+- Séances S1.3 (parcours C), d'après le cahier d'école : nombre manquant en PREMIÈRE position (« ? + 3 = 5 » avec un dé caché, puis sans support), presque-doubles dans les deux sens (4 + 5 puis 5 + 4), attention au signe moins (8 − 2). Remplacent c2_04, c2_07, c2_08, c3_03, c3_05, c3_06, c3_08 (lecture et écriture de nombres déjà réussies en classe).
+- 29 phrases en voix de secours en attendant leur génération.
+
 ## 0.3.2 — 2026-10-04
 - Séances S1.2 (parcours N) : additions de dizaines reprises pas à pas. N1 à N4 : barres de dix visibles à l'écran (47 + 10, 30 + 20, 36 + 20, 23 + 14, 34 + 10, 32 + 25, 20 + 20, vérifications). N5 seulement sans barres (50 + 30, 56 + 10). Retirés pour plus tard : 70 − 20, 27 + 15 (retenue), ajouter 9.
 - 15 phrases en voix de secours en attendant leur génération (11 nouvelles + 4 refusées au contrôle).
