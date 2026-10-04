@@ -1,6 +1,6 @@
 // Séances d'entraînement : configuration du moteur générique (deroule.js) + enchaînement.
 // Un profil suit UN parcours (C ou N), choisi dans l'espace parent (profil.parcours).
-// Les séances s'enchaînent dans l'ordre (C1 → C5, N1 → N5) ; une séance en pause est reprise.
+// Les séances s'enchaînent dans l'ordre (C1 → C5, N1 → N8) ; une séance en pause est reprise.
 import { PARCOURS, VERSION_SEANCES } from './parcours.js';
 import { classerSeance, syntheseSeance } from './ne_sait_pas.js';
 import { lancerDeroule } from '../deroule.js';

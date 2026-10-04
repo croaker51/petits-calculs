@@ -235,6 +235,23 @@ function fmtRep(r) {
   return String(r);
 }
 
+// ---------- Temps de réponse (S1.4, demande de Simon) ----------
+// Temps du 1er essai = réponse « réflexe » : court → résultat retrouvé de mémoire ; long → probablement
+// compté. AUCUN seuil n'est fixé (il dépend de l'enfant et de l'exercice) : on compare chaque exercice
+// aux autres exercices de la même passation. Affiché au parent uniquement (règle B3 : rien côté enfant).
+function tempsPremierEssai(r) { return r && r.essais && r.essais[0] ? r.essais[0].tempsMs : null; }
+function mediane(valeurs) {
+  const v = valeurs.filter(x => typeof x === 'number').sort((a, b) => a - b);
+  if (!v.length) return null;
+  const m = Math.floor(v.length / 2);
+  return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+}
+function barreTemps(ms, max) {
+  if (ms == null || !max) return '';
+  const pct = Math.max(4, Math.round(100 * Math.min(ms, max) / max));
+  return `<div class="barre-temps" title="${fmtTemps(ms)}"><span style="width:${pct}%"></span></div>`;
+}
+
 // Items, libellés et synthèse d'une passation (test ou séance).
 function contexteResultats(pass) {
   if (pass.type === 'seance') {
@@ -251,6 +268,9 @@ function resultats(passId, retour = tableauDeBord) {
   const p = S.getProfil(pass.profilId);
   const ctx = contexteResultats(pass);
   const syn = ctx.syn;
+  const temps1 = pass.items.map(tempsPremierEssai).filter(x => typeof x === 'number');
+  const tempsMax = temps1.length ? Math.max(...temps1) : 0;
+  const tempsMedian = mediane(pass.items.filter(x => x.classement === 'reussi-1er').map(tempsPremierEssai));
   const lignes = ctx.items.map(it => {
     const r = pass.items.find(x => x.itemId === it.id);
     const cl = r ? r.classement : 'non-passe';
@@ -261,7 +281,7 @@ function resultats(passId, retour = tableauDeBord) {
     if (r && it.canonique && r.essais.some(e => e.juste && e.canonique === false)) notes.push('juste mais pas sous la forme dizaines + unités');
     if (r && r.neSaitPas) notes.push(`« je ne sais pas » après ${fmtTemps(r.neSaitPas.tempsMs)}`);
     return `<tr class="cl-${cl}">
-      <td><b>${esc(it.id)}</b> ${esc(it.libelle)}<br><small>${esc(it.domaine)}</small>${notes.length ? `<br><small class="note">${notes.join(' · ')}</small>` : ''}</td>
+      <td><b>${esc(it.id)}</b> ${esc(it.libelle)}<br><small>${esc(it.domaine)}</small>${r && tempsPremierEssai(r) != null ? `<div class="temps-item"><small>Temps : ${fmtTemps(tempsPremierEssai(r))}</small>${barreTemps(tempsPremierEssai(r), tempsMax)}</div>` : ''}${notes.length ? `<br><small class="note">${notes.join(' · ')}</small>` : ''}</td>
       <td>${esc(String(it.attendu))}</td>
       <td>${e1 ? `${fmtRep(e1.reponse)}<br><small>${fmtTemps(e1.tempsMs)}</small>` : ''}</td>
       <td>${e2 ? `${fmtRep(e2.reponse)}<br><small>${fmtTemps(e2.tempsMs)}</small>` : ''}</td>
@@ -281,9 +301,11 @@ function resultats(passId, retour = tableauDeBord) {
         <div class="kpi cl-non-acquis"><b>${syn['non-acquis']}</b><small>non acquis</small></div>
         ${pass.type === 'seance' ? `<div class="kpi cl-ne-sait-pas"><b>${nsp}</b><small>« je ne sais pas »</small></div>` : ''}
         <div class="kpi"><b>${faits}/${total}</b><small>passés</small></div>
+        ${tempsMedian != null ? `<div class="kpi"><b>${fmtTemps(tempsMedian)}</b><small>temps médian (réussis du 1er coup)</small></div>` : ''}
       </section>
       <p class="aide-texte">Commencé le ${new Date(pass.debut).toLocaleString('fr-FR')}${pass.fin ? ' · fini le ' + new Date(pass.fin).toLocaleString('fr-FR') : ''} · appli ${esc(pass.appVersion)}.
       « Réussi au 2e essai » = l'enfant savait mais s'est précipité. Le temps est compté depuis la fin de la consigne orale.</p>
+      <p class="aide-texte">« Temps » (sous chaque exercice) : temps du 1er essai ; la barre le compare aux autres exercices de cette passation. Temps court = résultat retrouvé de mémoire ; temps long = probablement compté (sur les doigts, un par un). C'est une indication, pas un verdict : aucun seuil fixe. L'enfant ne voit jamais ce temps.</p>
       <div class="table-defile"><table class="resultats">
         <thead><tr><th>Item</th><th>Attendu</th><th>1er essai</th><th>2e essai</th><th>Bilan</th></tr></thead>
         <tbody>${lignes}</tbody></table></div>

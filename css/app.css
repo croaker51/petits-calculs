@@ -197,6 +197,11 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .resultats th, .resultats td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
 .resultats small { color: var(--doux); }
 .resultats .note { color: #b5651d; }
+/* Temps du 1er essai (espace parent uniquement, règle B3) */
+.temps-item { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.temps-item .barre-temps { margin-top: 0; }
+.barre-temps { width: 64px; height: 6px; background: #eee; border-radius: 3px; margin-top: 4px; overflow: hidden; }
+.barre-temps span { display: block; height: 100%; background: #8a8fb5; border-radius: 3px; }
 .pastille { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; background: #ccc; }
 .cl-reussi-1er .pastille, .kpi.cl-reussi-1er { background-color: transparent; }
 .cl-reussi-1er .pastille { background: var(--vert); } .kpi.cl-reussi-1er { border-top-color: var(--vert); }

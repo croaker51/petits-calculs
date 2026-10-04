@@ -2,6 +2,15 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.3.5 — 2026-10-04
+- Séances S1.4 (parcours N), d'après le cahier d'école (10 + 4 écrit 41, 92 écrit « 902 », 8 + 2 → 9) : trois séances ajoutées après N5, items existants inchangés.
+  - N6 : écrire sous la dictée les nombres 70-99 ; « 3 dizaines 5 unités » ; 10 + 4, 4 + 20 (pièges d'inversion 14 / 41, 35 / 53, 24 / 42).
+  - N7 : dizaines entières sans barres (30 + 20 …), dizaines + unités (40 + 3, 3 + 50, 60 + 7), suites de 10 en 10 et de 5 en 5 (aussi à rebours), re-test « de plus que ».
+  - N8 : calculer sans compter un par un : compléments à 5, passage par 5 (« une main = 5 »), doubles + 1.
+- Nouveau dessin d'aide : la main (une main pleine marquée 5, puis les doigts restants ; partie cherchée en orange), seulement dans l'aide.
+- Espace parent : temps du 1er essai sous chaque exercice, avec une barre qui le compare aux autres exercices de la passation, et temps médian des réussites du 1er coup (rien n'est montré à l'enfant).
+- Voix : 121 nouvelles phrases en voix clonée (90 de S1.4 + 31 en attente depuis 0.3.2-0.3.4), contrôlées par transcription. 3 phrases refusées au contrôle (n4_10_c, n7_12_c : nombres absents ; n8_04_e : mots ajoutés) restent en voix de secours, texte légèrement modifié pour une nouvelle prise.
+
 ## 0.3.4 — 2026-10-04
 - La scène ne dessine plus la réponse : plus d'emplacements vides (c1_02, c1_03, c1_05, c1_12, c2_03 : seuls les objets présents restent), plus de boîte de 10 dont les cases vides sont le nombre cherché (c2_01, c2_02, c2_05, c2_15, c3_01, c4_15 : calcul écrit seul). Ces supports passent dans l'aide, après 2 erreurs ou « ? ».
 - Consignes c2_01, c2_02, c2_05, c2_15, c4_15 réécrites (plus de renvoi à la boîte) ; voix de secours en attendant la génération.

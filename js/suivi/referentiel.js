@@ -97,7 +97,7 @@ export const COMPETENCES = [
   K('HP-R2', 'Hors programme', 'R', null, 'Continuer une suite régulière (de 2 en 2, de 3 en 3, à rebours…).')
 ];
 
-// Rattachement de chaque item (test T1 + séances S1.0) à UNE compétence.
+// Rattachement de chaque item (test T1 + séances S1.0 → S1.4) à UNE compétence.
 export const ITEM_COMPETENCE = {
   // Test de positionnement T1.0
   i01: 'CP-N1', i02: 'CP-N1', i03: 'CP-N3-59', i04: 'CP-N3-100', i05: 'CP-N4-59', i06: 'CP-N4-59', i07: 'CP-N6-100',
@@ -124,7 +124,25 @@ export const ITEM_COMPETENCE = {
   n4_03: 'CP-C2', n4_04: 'CP-C2', n4_05: 'CP-N8', n4_06: 'CP-C9', n4_07: 'CP-O1', n4_08: 'CP-C2', n4_09: 'CP-C2', n4_10: 'CP-C4',
   n4_11: 'CP-C6', n4_12: 'CE1-P1', n4_13: 'CP-C11', n4_14: 'CP-C9', n4_15: 'CP-C2', n5_01: 'CP-C1', n5_02: 'CP-C2', n5_03: 'CP-C1',
   n5_04: 'CP-N8', n5_05: 'CP-C5', n5_06: 'CP-O1', n5_07: 'CP-C2', n5_08: 'CP-C5', n5_09: 'CP-C2', n5_10: 'CP-C4', n5_11: 'CP-C11',
-  n5_12: 'CP-P2', n5_13: 'CP-N5-59', n5_14: 'CP-P3', n5_15: 'CP-C9'
+  n5_12: 'CP-P2', n5_13: 'CP-N5-59', n5_14: 'CP-P3', n5_15: 'CP-C9',
+  // Séances S1.4 (parcours N, séances 6 à 8)
+  // N6 : dictées 70-99 et « d dizaines u unités » → valeur de position ★ (le piège 92 → « 902 » est
+  // une erreur de position, pas de suite orale) ; 14, 24, 35, 53 → plage 0-59.
+  n6_01: 'CP-N5-100', n6_02: 'CP-N5-100', n6_03: 'CP-N5-100', n6_04: 'CP-N5-100', n6_05: 'CP-N5-100',
+  n6_06: 'CP-N5-100', n6_07: 'CP-N5-100', n6_08: 'CP-N5-100', n6_09: 'CP-N5-59', n6_10: 'CP-N5-59',
+  n6_11: 'CP-N5-59', n6_12: 'CP-N5-59', n6_13: 'CP-N5-59', n6_14: 'CP-N5-100', n6_15: 'CP-N5-100',
+  // N7 : dizaines entières = CP-C5 (même rattachement que n1_08, n2_07, n5_05) ; dizaines + unités
+  // (piège d'inversion) = valeur de position ★ ; suites = HP-R2 ; « de plus que » = CE1-P1 (comme
+  // i14 et n1_07 : le re-test se lit sur la même compétence).
+  n7_01: 'CP-C5', n7_02: 'CP-C5', n7_03: 'CP-C5', n7_04: 'CP-C5', n7_05: 'CP-C5',
+  n7_06: 'CP-N5-59', n7_07: 'CP-N5-59', n7_08: 'CP-N5-100',
+  n7_09: 'HP-R2', n7_10: 'HP-R2', n7_11: 'HP-R2', n7_12: 'HP-R2', n7_13: 'HP-R2',
+  n7_14: 'CE1-P1', n7_15: 'CE1-P1',
+  // N8 : compléments à 5, passage par 5, presque-doubles = tables d'addition ★ (comme n5_01, n5_03) ;
+  // doubles = CP-C2 ★.
+  n8_01: 'CP-C1', n8_02: 'CP-C1', n8_03: 'CP-C1', n8_04: 'CP-C1', n8_05: 'CP-C1', n8_06: 'CP-C1',
+  n8_07: 'CP-C1', n8_08: 'CP-C1', n8_09: 'CP-C2', n8_10: 'CP-C1', n8_11: 'CP-C2', n8_12: 'CP-C1',
+  n8_13: 'CP-C1', n8_14: 'CP-C1', n8_15: 'CP-C1'
 };
 
 // Compétences effectivement travaillées par au moins un item de l'appli.

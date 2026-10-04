@@ -123,3 +123,51 @@ export function droiteGraduee(debut, fin, etiquettes, fleche, montrerFleche = tr
 }
 // Abscisse attendue d'une valeur (utilisée par les tests pour vérifier la position de la flèche).
 export const abscisseDroite = (debut, fin, v) => 16 + (v - debut) * (320 - 32) / (fin - debut);
+
+// ---------- Séances S1.4 (parcours N, séance N8) : « une main = 5 » ----------
+// Objectif (demande de Simon) : ne plus compter un par un sur les doigts. On ne supprime pas les
+// doigts : on montre une MAIN PLEINE (5) d'un bloc, puis les doigts restants. Réservé à l'AIDE
+// (après 2 erreurs ou « ? ») — la scène n'en dessine jamais (règle B13).
+// Dessin SVG original (règle A12). Ordre des doigts levés : pouce, index, majeur, annulaire, auriculaire.
+// leves = doigts levés couleur peau ; surlignes = doigts levés suivants, en orange (la partie à
+// trouver, montrée seulement dans l'aide) ; les autres doigts sont repliés.
+const DOIGTS = [ // [x, largeur, hauteur levé, rotation] — viewBox 100 × 120, base des doigts à y = 58
+  [16, 13, 30, -38], [31, 12, 44, -6], [46, 12, 50, 0], [61, 12, 46, 5], [75, 11, 36, 11]
+];
+export function main(leves, surlignes = 0, taille = 84) {
+  if (!Number.isInteger(leves) || !Number.isInteger(surlignes) || leves < 0 || surlignes < 0 || leves + surlignes > 5) {
+    throw new Error('main : 0 à 5 doigts levés');
+  }
+  const pleine = leves === 5;
+  let doigts = '';
+  DOIGTS.forEach(([x, l, h, rot], i) => {
+    const leve = i < leves + surlignes;
+    const orange = i >= leves && leve;
+    const haut = leve ? h : 12; // replié = moignon court
+    const y = 62 - haut;
+    const pivotX = x + l / 2;
+    doigts += `<rect class="${leve ? (orange ? 'doigt doigt-orange' : 'doigt') : 'doigt-replie'}" x="${x}" y="${y}" width="${l}" height="${haut + 8}" rx="${l / 2}"
+      transform="rotate(${rot} ${pivotX} 64)" fill="${orange ? '#f29e4c' : '#f6c89f'}" stroke="#2d2a32" stroke-width="3"/>`;
+  });
+  return `<svg class="main${pleine ? ' main-pleine' : ''}" data-doigts="${leves + surlignes}" width="${taille}" height="${Math.round(taille * 1.2)}" viewBox="0 0 100 120" aria-hidden="true">
+    ${doigts}<rect x="18" y="56" width="70" height="56" rx="22" fill="#f6c89f" stroke="#2d2a32" stroke-width="3"/>
+    ${pleine ? '<text x="53" y="96" text-anchor="middle" font-size="30" font-weight="800" fill="#2d2a32">5</text>' : ''}</svg>`;
+}
+
+// n (0 à 20) montré en mains : autant de mains PLEINES que possible (chacune marquée « 5 »), puis
+// une main avec les doigts restants. surlignes = nombre de doigts, parmi les derniers, mis en
+// orange (ex. 8 = 5 + ? → mains(8, 3) : une main pleine + 3 doigts orange).
+export function mains(n, surlignes = 0, taille = 80) {
+  if (!Number.isInteger(n) || n < 0 || n > 20 || surlignes < 0 || surlignes > n) throw new Error('mains : 0 à 20');
+  const parts = [];
+  let reste = n, orange = surlignes;
+  while (reste > 0) {
+    const k = Math.min(5, reste);
+    reste -= k;
+    // Les doigts orange sont les DERNIERS : on les prend sur les mains de droite.
+    const oIci = Math.max(0, Math.min(k, orange - reste));
+    parts.push(main(k - oIci, oIci, taille));
+  }
+  if (!parts.length) parts.push(main(0, 0, taille));
+  return `<div class="groupes mains">${parts.join('')}</div>`;
+}

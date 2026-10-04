@@ -15,10 +15,10 @@
 // Phrases audio : PHRASES[id + '_c'] (consigne) et PHRASES[id + '_e'] (explication) dans phrases.js.
 import {
   rangee, barresCubes, boiteDe10, bande, grand, grandLong, TROU, emplacements,
-  suiteATrou, dictee, calculAmi, ligneAide, illustration, de, deuxDes, droiteGraduee
+  suiteATrou, dictee, calculAmi, ligneAide, illustration, de, deuxDes, droiteGraduee, main, mains
 } from '../rendu.js';
 
-export const VERSION_SEANCES = 'S1.3'; // S1.0 : séances 1-3 ; S1.1 : + séances 4-5 ; S1.2 : additions de dizaines du parcours N reprises avec les barres ; S1.3 : parcours C, terme manquant en 1re position, presque-doubles, signe moins
+export const VERSION_SEANCES = 'S1.4'; // S1.0 : séances 1-3 ; S1.1 : + séances 4-5 ; S1.2 : additions de dizaines du parcours N reprises avec les barres ; S1.3 : parcours C, terme manquant en 1re position, presque-doubles, signe moins ; S1.4 : parcours N, séances N6-N8 (écriture 70-99 et inversions, dizaines sans barres, suites, calculer sans compter)
 
 // ---------- Fabriques (la vérification est toujours une égalité stricte, ou une tolérance pour la ligne) ----------
 const pave = o => ({ type: 'pave', verifier: r => r === o.attendu, ...o });
@@ -404,6 +404,107 @@ const N5 = [
     scene: () => grand(`44 + 35 = ${TROU}`), aide: () => barresCubes(7, 9, true) + grand('40 + 30 = 70') + grand('4 + 5 = 9') })
 ];
 
+// =====================================================================================
+// S1.4 (session 5) — parcours N, séances 6 à 8, d'après le cahier d'école (inversions 10 + 4 → 41,
+// « 902 » pour 92, 8 + 2 → 9) et la demande de Simon : ne plus compter un par un sur les doigts.
+// Règle B13 : la scène ne montre que les données ; barres, cubes et mains sont dans l'aide.
+// =====================================================================================
+// « 3 dizaines 5 unités » écrit en toutes lettres (singulier / pluriel), sans barres.
+const dizUnites = n => {
+  const d = Math.floor(n / 10), u = n % 10;
+  return grandLong(`${d} dizaine${d > 1 ? 's' : ''} ${u} unité${u > 1 ? 's' : ''}`);
+};
+// Aide N6-N7 : le nombre en barres de dix + cubes, puis l'écriture.
+const aideBC = (n, ...lignes) => () => barresCubes(Math.floor(n / 10), n % 10, true) + lignes.map(t => (t.length > 12 ? grandLong(t) : grand(t))).join('');
+// Nombre dicté (oreille seule) : la scène n'affiche rien de dénombrable.
+const dicte = (id, n) => pave({ id, domaine: 'Écriture des nombres', libelle: `Dictée : ${n}`, attendu: n,
+  scene: () => dictee(), aide: aideBC(n, String(n)) });
+// « total = a + ? » écrit seul (scène), réponse au pavé.
+const decomp = (id, domaine, libelle, total, a, attendu, aide) => pave({ id, domaine, libelle, attendu,
+  scene: () => grand(`${total} = ${a} + ${TROU}`), aide });
+// Calcul écrit seul (scène), réponse au pavé.
+const calcul = (id, domaine, libelle, ecrit, attendu, aide) => pave({ id, domaine, libelle, attendu,
+  scene: () => grand(`${ecrit} = ${TROU}`), aide });
+
+const N6 = [
+  dicte('n6_01', 72),
+  dicte('n6_02', 81),
+  dicte('n6_03', 92),
+  dicte('n6_04', 78),
+  dicte('n6_05', 97),
+  dicte('n6_06', 85),
+  dicte('n6_07', 71),
+  dicte('n6_08', 99),
+  pave({ id: 'n6_09', domaine: 'Dizaines / unités', libelle: '1 dizaine 4 unités (piège 41)', attendu: 14,
+    scene: () => dizUnites(14), aide: aideBC(14, '14') }),
+  pave({ id: 'n6_10', domaine: 'Dizaines / unités', libelle: '3 dizaines 5 unités (piège 53)', attendu: 35,
+    scene: () => dizUnites(35), aide: aideBC(35, '35') }),
+  pave({ id: 'n6_11', domaine: 'Dizaines / unités', libelle: '5 dizaines 3 unités (piège 35)', attendu: 53,
+    scene: () => dizUnites(53), aide: aideBC(53, '53') }),
+  calcul('n6_12', 'Dizaines / unités', '10 + 4 (piège 41, vu dans le cahier)', '10 + 4', 14, aideBC(14, '10 + 4 = 14')),
+  calcul('n6_13', 'Dizaines / unités', '4 + 20 (piège 42)', '4 + 20', 24, aideBC(24, '4 + 20 = 24')),
+  pave({ id: 'n6_14', domaine: 'Dizaines / unités', libelle: '8 dizaines 2 unités (piège 802)', attendu: 82,
+    scene: () => dizUnites(82), aide: aideBC(82, '82') }),
+  pave({ id: 'n6_15', domaine: 'Dizaines / unités', libelle: '9 dizaines 1 unité (piège 901)', attendu: 91,
+    scene: () => dizUnites(91), aide: aideBC(91, '91') })
+];
+
+const N7 = [
+  calcul('n7_01', 'Calcul (dizaines)', '30 + 20 (sans barres)', '30 + 20', 50, aideBC(50, '30 + 20 = 50')),
+  calcul('n7_02', 'Calcul (dizaines)', '40 + 30 (sans barres)', '40 + 30', 70, aideBC(70, '40 + 30 = 70')),
+  calcul('n7_03', 'Calcul (dizaines)', '50 + 40 (sans barres)', '50 + 40', 90, aideBC(90, '50 + 40 = 90')),
+  calcul('n7_04', 'Calcul (dizaines)', '20 + 60 (sans barres)', '20 + 60', 80, aideBC(80, '20 + 60 = 80')),
+  calcul('n7_05', 'Calcul (dizaines)', '10 + 50 (sans barres)', '10 + 50', 60, aideBC(60, '10 + 50 = 60')),
+  calcul('n7_06', 'Dizaines / unités', '40 + 3 (piège 34)', '40 + 3', 43, aideBC(43, '40 + 3 = 43')),
+  calcul('n7_07', 'Dizaines / unités', '3 + 50 (piège 35)', '3 + 50', 53, aideBC(53, '3 + 50 = 53')),
+  calcul('n7_08', 'Dizaines / unités', '60 + 7 (piège 76)', '60 + 7', 67, aideBC(67, '60 + 7 = 67')),
+  pave({ id: 'n7_09', domaine: 'Suite logique', libelle: '50, 60, 70, … ? (de 10 en 10)', attendu: 80,
+    scene: () => suiteATrou([50, 60, 70]), aide: aideBC(80, '50 · 60 · 70 · 80') }),
+  pave({ id: 'n7_10', domaine: 'Suite logique', libelle: '5, 10, 15, … ? (de 5 en 5)', attendu: 20,
+    scene: () => suiteATrou([5, 10, 15]), aide: aideBC(20, '5 · 10 · 15 · 20') }),
+  pave({ id: 'n7_11', domaine: 'Suite logique', libelle: '20, 25, 30, … ? (de 5 en 5)', attendu: 35,
+    scene: () => suiteATrou([20, 25, 30]), aide: aideBC(35, '20 · 25 · 30 · 35') }),
+  pave({ id: 'n7_12', domaine: 'Suite logique', libelle: '20, 15, 10, … ? (à rebours de 5 en 5)', attendu: 5,
+    scene: () => suiteATrou([20, 15, 10]), aide: aideBC(5, '20 · 15 · 10 · 5') }),
+  pave({ id: 'n7_13', domaine: 'Suite logique', libelle: '30, 25, 20, … ? (à rebours de 5 en 5)', attendu: 15,
+    scene: () => suiteATrou([30, 25, 20]), aide: aideBC(15, '30 · 25 · 20 · 15') }),
+  // « De plus que » : la scène montre seulement les billes de la donnée de départ (B13).
+  pave({ id: 'n7_14', domaine: 'Problème (comparaison)', libelle: 'Tom 6 billes, Léa 3 de plus (re-test i14 / n1_07)', attendu: 9,
+    scene: () => `<div class="probleme-aide"><div><b>Tom</b>${rangee('bille', 6, 30)}</div></div>`,
+    aide: () => deuxRangees('bille', 6, 9) + grand('6 + 3 = 9') }),
+  pave({ id: 'n7_15', domaine: 'Problème (comparaison)', libelle: 'Léa 7 billes, Tom 5 de plus', attendu: 12,
+    scene: () => `<div class="probleme-aide"><div><b>Léa</b>${rangee('bille', 7, 30)}</div></div>`,
+    aide: () => deuxRangees('bille', 7, 12, 'Léa', 'Tom') + grand('7 + 5 = 12') })
+];
+
+// N8 — « Calculer sans compter » : compléments à 5, passage par 5, doubles + 1.
+// Scène : le calcul écrit seul, ni main ni doigts. Aide : mains (une main pleine = 5, puis les
+// doigts restants), jamais des points à compter un par un ; doubles + 1 : le double, puis « + 1 ».
+const N8 = [
+  decomp('n8_01', 'Compléments à 5', '5 = 3 + ?', 5, 3, 2, () => mains(5, 2) + grand('3 + 2 = 5')),
+  decomp('n8_02', 'Compléments à 5', '5 = 1 + ?', 5, 1, 4, () => mains(5, 4) + grand('1 + 4 = 5')),
+  calcul('n8_03', 'Passage par 5', '5 + 2 (une main et deux doigts)', '5 + 2', 7, () => mains(7, 2) + grand('5 + 2 = 7')),
+  calcul('n8_04', 'Passage par 5', '5 + 3', '5 + 3', 8, () => mains(8, 3) + grand('5 + 3 = 8')),
+  calcul('n8_05', 'Passage par 5', '5 + 4', '5 + 4', 9, () => mains(9, 4) + grand('5 + 4 = 9')),
+  decomp('n8_06', 'Passage par 5', '8 = 5 + ?', 8, 5, 3, () => mains(8, 3) + grand('8 = 5 + 3')),
+  decomp('n8_07', 'Passage par 5', '7 = 5 + ?', 7, 5, 2, () => mains(7, 2) + grand('7 = 5 + 2')),
+  decomp('n8_08', 'Passage par 5', '6 = 5 + ?', 6, 5, 1, () => mains(6, 1) + grand('6 = 5 + 1')),
+  calcul('n8_09', 'Doubles', '3 + 3', '3 + 3', 6, () => `<div class="groupes">${main(3)}<span class="plus">+</span>${main(3)}</div>` + grand('3 + 3 = 6')),
+  pave({ id: 'n8_10', domaine: 'Doubles + 1', libelle: '3 + 3 = 6, alors 3 + 4 ?', attendu: 7,
+    scene: () => grandLong('3 + 3 = 6') + grand(`3 + 4 = ${TROU}`),
+    aide: () => `<div class="groupes">${main(3)}<span class="plus">+</span>${main(3, 1)}</div>` + grand('3 + 3 = 6') + grand('6 + 1 = 7') }),
+  calcul('n8_11', 'Doubles', '4 + 4', '4 + 4', 8, () => `<div class="groupes">${main(4)}<span class="plus">+</span>${main(4)}</div>` + grand('4 + 4 = 8')),
+  pave({ id: 'n8_12', domaine: 'Doubles + 1', libelle: '4 + 4 = 8, alors 4 + 5 ?', attendu: 9,
+    scene: () => grandLong('4 + 4 = 8') + grand(`4 + 5 = ${TROU}`),
+    aide: () => `<div class="groupes">${main(4)}<span class="plus">+</span>${main(4, 1)}</div>` + grand('4 + 4 = 8') + grand('8 + 1 = 9') }),
+  calcul('n8_13', 'Doubles + 1', '2 + 3 (double donné seulement dans l\'aide)', '2 + 3', 5,
+    () => `<div class="groupes">${main(2)}<span class="plus">+</span>${main(2, 1)}</div>` + grand('2 + 2 = 4') + grand('4 + 1 = 5')),
+  calcul('n8_14', 'Doubles + 1', '4 + 3 (= 3 + 3 + 1)', '4 + 3', 7,
+    () => `<div class="groupes">${main(3, 1)}<span class="plus">+</span>${main(3)}</div>` + grand('3 + 3 = 6') + grand('6 + 1 = 7')),
+  calcul('n8_15', 'Doubles + 1', '5 + 6 (= 5 + 5 + 1)', '5 + 6', 11,
+    () => `<div class="groupes">${main(5)}<span class="plus">+</span>${main(5)}${main(0, 1)}</div>` + grand('5 + 5 = 10') + grand('10 + 1 = 11'))
+];
+
 export const PARCOURS = {
   C: {
     code: 'C', titre: 'Décomposer et compléter',
@@ -422,7 +523,10 @@ export const PARCOURS = {
       { id: 'N2', objectif: 'Jusqu\'à 100 ; forme non canonique ; calcul en dizaines ; problème à deux étapes', items: N2 },
       { id: 'N3', objectif: 'Comparaison inversée et écart ; décomposition ; à rebours ; deux étapes', items: N3 },
       { id: 'N4', objectif: 'Doubles et moitiés ; droite graduée 40-60 ; additions sans retenue ; ajouter 9 ; état initial inconnu', items: N4 },
-      { id: 'N5', objectif: 'Presque-doubles ; addition avec retenue ; droite 70-90 ; valeur du chiffre ; problème multiplicatif', items: N5 }
+      { id: 'N5', objectif: 'Presque-doubles ; addition avec retenue ; droite 70-90 ; valeur du chiffre ; problème multiplicatif', items: N5 },
+      { id: 'N6', objectif: 'Écrire les nombres 70-99 sous la dictée ; dizaines + unités sans inverser les chiffres (14 / 41, 92 / 902)', items: N6 },
+      { id: 'N7', objectif: 'Dizaines sans barres ; dizaines + unités ; suites de 10 en 10 et de 5 en 5 ; re-test « de plus que »', items: N7 },
+      { id: 'N8', objectif: 'Calculer sans compter un par un : compléments à 5, passage par 5 (une main = 5), doubles + 1', items: N8 }
     ]
   }
 };
