@@ -15,10 +15,10 @@
 // Phrases audio : PHRASES[id + '_c'] (consigne) et PHRASES[id + '_e'] (explication) dans phrases.js.
 import {
   rangee, barresCubes, boiteDe10, bande, grand, grandLong, TROU, emplacements,
-  suiteATrou, dictee, calculAmi, ligneAide, illustration
+  suiteATrou, dictee, calculAmi, ligneAide, illustration, de, deuxDes, droiteGraduee
 } from '../rendu.js';
 
-export const VERSION_SEANCES = 'S1.0';
+export const VERSION_SEANCES = 'S1.1'; // S1.0 : séances 1-3 ; S1.1 : + séances 4-5
 
 // ---------- Fabriques (la vérification est toujours une égalité stricte, ou une tolérance pour la ligne) ----------
 const pave = o => ({ type: 'pave', verifier: r => r === o.attendu, ...o });
@@ -125,7 +125,7 @@ const C2 = [
   pave({ id: 'c2_11', domaine: 'Décomposition', libelle: '6 + ? = 8 (objets visibles)', attendu: 2,
     scene: () => grand(`6 + ${TROU} = 8`) + rangee('etoile', 6, 40), aide: () => deuxGroupes('etoile', 6, 2) + grand('6 + 2 = 8') }),
   pave({ id: 'c2_12', domaine: 'Dizaines / unités', libelle: '47 : combien de barres de dix ? (erreur i05)', attendu: 4,
-    scene: () => grand('47') + barresCubes(4, 7), aide: () => grand('47') + barresCubes(4, 7, true) }),
+    scene: () => grandLong('47') + barresCubes(4, 7), aide: () => grand('47') + barresCubes(4, 7, true) }),
   pave({ id: 'c2_13', domaine: 'Problème (ajout)', libelle: 'Léa a 5 étoiles, elle en gagne 4', attendu: 9,
     scene: () => illustration('etoile', 1, 110), aide: () => deuxGroupes('etoile', 5, 4) + grand('5 + 4 = 9') }),
   choix({ id: 'c2_14', domaine: 'Comparaison', libelle: 'Le plus petit parmi 57, 75, 55', choix: [57, 75, 55], attendu: 55,
@@ -159,7 +159,7 @@ const C3 = [
   pave({ id: 'c3_12', domaine: 'Compléments à 10', libelle: '4 + 6 (lien avec 6 + 4 du test)', attendu: 10,
     scene: () => grand(`4 + 6 = ${TROU}`), aide: () => boiteDe10(4, 6) + grand('4 + 6 = 10') }),
   pave({ id: 'c3_13', domaine: 'Dizaines / unités', libelle: '58 : combien de petits cubes ?', attendu: 8,
-    scene: () => grand('58') + barresCubes(5, 8), aide: () => grand('58') + barresCubes(5, 8, true) }),
+    scene: () => grandLong('58') + barresCubes(5, 8), aide: () => grand('58') + barresCubes(5, 8, true) }),
   pave({ id: 'c3_14', domaine: 'Problème (comparaison)', libelle: 'Tom 5 cartes, Léa 2 de plus (erreur i14)', attendu: 7,
     scene: () => illustration('carte', 2, 70), aide: () => deuxRangees('carte', 5, 7) + grand('5 + 2 = 7') }),
   pave({ id: 'c3_15', domaine: 'Compléments à 10', libelle: '10 = 6 + ? sans support', attendu: 4,
@@ -262,13 +262,150 @@ const N3 = [
     scene: () => illustration('etoile', 1, 110), aide: () => bande(46, 50, 50) + grand('46 + 4 = 50') })
 ];
 
+// =====================================================================================
+// S1.1 (session 4) — séances 4 et 5 de chaque parcours.
+// Dés : 5 points au maximum (compléments à 5 vus en classe avec ce matériel).
+// =====================================================================================
+const C4 = [
+  pave({ id: 'c4_01', domaine: 'Quantités', libelle: 'Dé : 4 points (reconnaître sans compter)', attendu: 4,
+    scene: () => `<div class="groupes">${de(4, 110)}</div>`, aide: () => `<div class="groupes">${de(4, 110)}</div>` + grand('4') }),
+  pave({ id: 'c4_02', domaine: 'Compléments à 5', libelle: 'Dés : 3 + ? = 5', attendu: 2,
+    scene: () => deuxDes(3, null), aide: () => deuxDes(3, 2) + grand('3 + 2 = 5') }),
+  pave({ id: 'c4_03', domaine: 'Compléments à 5', libelle: 'Dés : 1 + ? = 5', attendu: 4,
+    scene: () => deuxDes(1, null), aide: () => deuxDes(1, 4) + grand('1 + 4 = 5') }),
+  pave({ id: 'c4_04', domaine: 'Doubles', libelle: 'Dés : 2 et 2 (double de 2)', attendu: 4,
+    scene: () => deuxDes(2, 2), aide: () => deuxDes(2, 2) + grand('2 + 2 = 4') }),
+  pave({ id: 'c4_05', domaine: 'Compléments à 5', libelle: 'Dés : 4 + ? = 5', attendu: 1,
+    scene: () => deuxDes(4, null), aide: () => deuxDes(4, 1) + grand('4 + 1 = 5') }),
+  pave({ id: 'c4_06', domaine: 'Doubles', libelle: 'Dés : 3 et 3 (double de 3)', attendu: 6,
+    scene: () => deuxDes(3, 3), aide: () => deuxDes(3, 3) + grand('3 + 3 = 6') }),
+  pave({ id: 'c4_07', domaine: 'Droite graduée', libelle: 'Droite 0–10 graduée de 1 en 1 : la flèche montre 7', attendu: 7,
+    scene: () => droiteGraduee(0, 10, [0, 5, 10], 7), aide: () => droiteGraduee(0, 10, [0, 5, 6, 7, 10], 7) + grand('5, 6, 7') }),
+  pave({ id: 'c4_08', domaine: 'Compléments à 5', libelle: 'Dés : 2 + ? = 5', attendu: 3,
+    scene: () => deuxDes(2, null), aide: () => deuxDes(2, 3) + grand('2 + 3 = 5') }),
+  pave({ id: 'c4_09', domaine: 'Décomposition', libelle: 'Dés : 5 et 3 → 8 (lien avec 8 = 5 + 3, i10)', attendu: 8,
+    scene: () => deuxDes(5, 3), aide: () => deuxDes(5, 3) + grand('5 + 3 = 8') }),
+  pave({ id: 'c4_10', domaine: 'Doubles', libelle: 'Dés : 5 et 5 (double de 5)', attendu: 10,
+    scene: () => deuxDes(5, 5), aide: () => deuxDes(5, 5) + grand('5 + 5 = 10') }),
+  pave({ id: 'c4_11', domaine: 'Dizaines / unités', libelle: 'Lire 4 barres + 6 cubes (46)', attendu: 46,
+    scene: () => barresCubes(4, 6), aide: () => barresCubes(4, 6, true) + grand('46') }),
+  pave({ id: 'c4_12', domaine: 'Compléments à 5', libelle: '5 = 2 + ? sans dé', attendu: 3,
+    scene: () => grand(`5 = 2 + ${TROU}`), aide: () => deuxDes(2, 3) + grand('5 = 2 + 3') }),
+  pave({ id: 'c4_13', domaine: 'Doubles', libelle: 'Dés : 4 et 4 (double de 4)', attendu: 8,
+    scene: () => deuxDes(4, 4), aide: () => deuxDes(4, 4) + grand('4 + 4 = 8') }),
+  pave({ id: 'c4_14', domaine: 'Sens des opérations', libelle: '5 bonbons, elle en mange, il en reste 2 : combien mangés ?', attendu: 3,
+    scene: () => illustration('bonbon', 1, 120), aide: () => rangee('bonbon', 5, 40, 3) + grand('5 − 3 = 2') }),
+  pave({ id: 'c4_15', domaine: 'Compléments à 10', libelle: '6 + ? = 10 avec la boîte (reprise de i09)', attendu: 4,
+    scene: () => grand(`6 + ${TROU} = 10`) + boiteDe10(6), aide: () => boiteDe10(6, 4) + grand('6 + 4 = 10') })
+];
+
+const C5 = [
+  pave({ id: 'c5_01', domaine: 'Compléments à 5', libelle: 'Dés : 1 + ? = 5 (reprise)', attendu: 4,
+    scene: () => deuxDes(1, null), aide: () => deuxDes(1, 4) + grand('1 + 4 = 5') }),
+  pave({ id: 'c5_02', domaine: 'Doubles', libelle: 'Double de 3 sans dé', attendu: 6,
+    scene: () => grand(`3 + 3 = ${TROU}`), aide: () => deuxDes(3, 3) + grand('3 + 3 = 6') }),
+  pave({ id: 'c5_03', domaine: 'Décomposition', libelle: '7 = 5 + ? (dé de 5 visible)', attendu: 2,
+    scene: () => grand(`7 = 5 + ${TROU}`) + deuxDes(5, null, 64), aide: () => deuxDes(5, 2) + grand('7 = 5 + 2') }),
+  pave({ id: 'c5_04', domaine: 'Droite graduée', libelle: 'Droite 0–20 graduée de 1 en 1 : la flèche montre 13', attendu: 13,
+    scene: () => droiteGraduee(0, 20, [0, 10, 20], 13), aide: () => droiteGraduee(0, 20, [0, 10, 11, 12, 13, 20], 13) + grand('10, 11, 12, 13') }),
+  pave({ id: 'c5_05', domaine: 'Doubles', libelle: 'Double de 4 sans dé', attendu: 8,
+    scene: () => grand(`4 + 4 = ${TROU}`), aide: () => deuxDes(4, 4) + grand('4 + 4 = 8') }),
+  pave({ id: 'c5_06', domaine: 'Décomposition', libelle: '9 = 5 + ? (dé de 5 visible)', attendu: 4,
+    scene: () => grand(`9 = 5 + ${TROU}`) + deuxDes(5, null, 64), aide: () => deuxDes(5, 4) + grand('9 = 5 + 4') }),
+  pave({ id: 'c5_07', domaine: 'Compléments à 10', libelle: '10 = 8 + ? sans boîte', attendu: 2,
+    scene: () => grand(`10 = 8 + ${TROU}`), aide: () => boiteDe10(8, 2) + grand('10 = 8 + 2') }),
+  pave({ id: 'c5_08', domaine: 'Écriture des nombres', libelle: 'Dictée : 92', attendu: 92,
+    scene: () => dictee(), aide: () => barresCubes(9, 2, true) + grand('92') }),
+  pave({ id: 'c5_09', domaine: 'Dizaines / unités', libelle: '63 : combien de barres de dix ?', attendu: 6,
+    scene: () => grandLong('63') + barresCubes(6, 3), aide: () => grand('63') + barresCubes(6, 3, true) }),
+  pave({ id: 'c5_10', domaine: 'Doubles', libelle: 'Double de 5 sans dé', attendu: 10,
+    scene: () => grand(`5 + 5 = ${TROU}`), aide: () => deuxDes(5, 5) + grand('5 + 5 = 10') }),
+  pave({ id: 'c5_11', domaine: 'Sens des opérations', libelle: 'Tom avait 6 cartes, on lui en donne, il en a 8 : combien données ?', attendu: 2,
+    scene: () => illustration('carte', 2, 70), aide: () => deuxGroupes('carte', 6, 2, 26) + grand('6 + 2 = 8') }),
+  pave({ id: 'c5_12', domaine: 'Compléments à 5', libelle: '5 = 4 + ? sans dé', attendu: 1,
+    scene: () => grand(`5 = 4 + ${TROU}`), aide: () => deuxDes(4, 1) + grand('5 = 4 + 1') }),
+  pave({ id: 'c5_13', domaine: 'Calcul', libelle: '12 + 13 (deux nombres à deux chiffres)', attendu: 25,
+    scene: () => grand(`12 + 13 = ${TROU}`), aide: () => barresCubes(2, 5, true) + grand('10 + 10 = 20') + grand('2 + 3 = 5') }),
+  pave({ id: 'c5_14', domaine: 'Moitiés', libelle: '6 bonbons partagés entre 2 amis, autant chacun', attendu: 3,
+    scene: () => rangee('bonbon', 6, 40), aide: () => deuxGroupes('bonbon', 3, 3) + grand('3 + 3 = 6') }),
+  construire('c5_15', 59)
+];
+
+const N4 = [
+  pave({ id: 'n4_01', domaine: 'Doubles', libelle: 'Dés : 4 et 4', attendu: 8,
+    scene: () => deuxDes(4, 4), aide: () => deuxDes(4, 4) + grand('4 + 4 = 8') }),
+  pave({ id: 'n4_02', domaine: 'Compléments à 5', libelle: 'Dés : 2 + ? = 5', attendu: 3,
+    scene: () => deuxDes(2, null), aide: () => deuxDes(2, 3) + grand('2 + 3 = 5') }),
+  pave({ id: 'n4_03', domaine: 'Doubles', libelle: 'Double de 6', attendu: 12,
+    scene: () => grand(`6 + 6 = ${TROU}`), aide: () => deuxGroupes('point', 6, 6, 20) + grand('6 + 6 = 12') }),
+  pave({ id: 'n4_04', domaine: 'Moitiés', libelle: '10 billes en deux parts égales', attendu: 5,
+    scene: () => rangee('bille', 10, 30), aide: () => deuxGroupes('bille', 5, 5, 28) + grand('5 + 5 = 10') }),
+  pave({ id: 'n4_05', domaine: 'Droite graduée', libelle: 'Droite 40–60 graduée de 1 en 1 : la flèche montre 47', attendu: 47,
+    scene: () => droiteGraduee(40, 60, [40, 50, 60], 47), aide: () => droiteGraduee(40, 60, [40, 45, 47, 50, 60], 47) + grand('45, 46, 47') }),
+  pave({ id: 'n4_06', domaine: 'Calcul', libelle: '23 + 14', attendu: 37,
+    scene: () => grand(`23 + 14 = ${TROU}`), aide: () => barresCubes(3, 7, true) + grand('20 + 10 = 30') + grand('3 + 4 = 7') }),
+  pave({ id: 'n4_07', domaine: 'Sens des opérations', libelle: 'Léa avait ? cartes, elle en gagne 3, elle en a 9 : combien avant ?', attendu: 6,
+    scene: () => illustration('carte', 2, 70), aide: () => deuxGroupes('carte', 6, 3, 24) + grand('9 − 3 = 6') }),
+  pave({ id: 'n4_08', domaine: 'Doubles', libelle: 'Double de 20', attendu: 40,
+    scene: () => grand(`20 + 20 = ${TROU}`), aide: () => barresCubes(4, 0, true) + grand('20 + 20 = 40') }),
+  pave({ id: 'n4_09', domaine: 'Vérification', libelle: 'Un ami a trouvé 6 + 6 = 13 : bon résultat ?', attendu: 12,
+    scene: () => calculAmi('6 + 6', 13), aide: () => deuxGroupes('point', 6, 6, 20) + grand('6 + 6 = 12') }),
+  pave({ id: 'n4_10', domaine: 'Calcul', libelle: '34 + 9 (ajouter 10, enlever 1)', attendu: 43,
+    scene: () => grand(`34 + 9 = ${TROU}`), aide: () => grand('34 + 10 = 44') + grand('44 − 1 = 43') }),
+  pave({ id: 'n4_11', domaine: 'Compléments à la dizaine', libelle: '63 + ? = 70', attendu: 7,
+    scene: () => grand(`63 + ${TROU} = 70`), aide: () => bande(63, 70, 70) + grand('63 + 7 = 70') }),
+  pave({ id: 'n4_12', domaine: 'Problème (écart)', libelle: 'Tom 12 billes, Léa 8 : combien Tom en a-t-il de plus ?', attendu: 4,
+    scene: () => illustration('bille', 2, 70), aide: () => deuxRangees('bille', 12, 8) + grand('8 + 4 = 12') }),
+  pave({ id: 'n4_13', domaine: 'Calcul', libelle: '40 − 3', attendu: 37,
+    scene: () => grand(`40 − 3 = ${TROU}`), aide: () => bande(36, 40, 37) + grand('40 − 3 = 37') }),
+  pave({ id: 'n4_14', domaine: 'Calcul', libelle: '32 + 25', attendu: 57,
+    scene: () => grand(`32 + 25 = ${TROU}`), aide: () => barresCubes(5, 7, true) + grand('30 + 20 = 50') + grand('2 + 5 = 7') }),
+  pave({ id: 'n4_15', domaine: 'Moitiés', libelle: 'Moitié de 40', attendu: 20,
+    scene: () => grand(`40 = ${TROU} + ${TROU}`), aide: () => barresCubes(2, 0) + '<span class="plus">+</span>' + barresCubes(2, 0) + grand('20 + 20 = 40') })
+];
+
+const N5 = [
+  pave({ id: 'n5_01', domaine: 'Compléments à 5', libelle: 'Dés : 3 + ? = 5', attendu: 2,
+    scene: () => deuxDes(3, null), aide: () => deuxDes(3, 2) + grand('3 + 2 = 5') }),
+  pave({ id: 'n5_02', domaine: 'Doubles', libelle: 'Double de 7', attendu: 14,
+    scene: () => grand(`7 + 7 = ${TROU}`), aide: () => deuxGroupes('point', 7, 7, 18) + grand('7 + 7 = 14') }),
+  pave({ id: 'n5_03', domaine: 'Doubles', libelle: '7 + 8 (presque-double)', attendu: 15,
+    scene: () => grand(`7 + 8 = ${TROU}`), aide: () => grand('7 + 7 = 14') + grand('14 + 1 = 15') }),
+  pave({ id: 'n5_04', domaine: 'Droite graduée', libelle: 'Droite 70–90 graduée de 1 en 1 : la flèche montre 83', attendu: 83,
+    scene: () => droiteGraduee(70, 90, [70, 80, 90], 83), aide: () => droiteGraduee(70, 90, [70, 80, 83, 90], 83) + grand('80, 81, 82, 83') }),
+  pave({ id: 'n5_05', domaine: 'Calcul', libelle: '27 + 15 (avec passage de la dizaine)', attendu: 42,
+    scene: () => grand(`27 + 15 = ${TROU}`), aide: () => grand('20 + 10 = 30') + grand('7 + 5 = 12') + grand('30 + 12 = 42') }),
+  pave({ id: 'n5_06', domaine: 'Sens des opérations', libelle: 'Boîte : on enlève 4 billes, il en reste 7 : combien au début ?', attendu: 11,
+    scene: () => illustration('bille', 1, 110), aide: () => rangee('bille', 11, 26, 4) + grand('7 + 4 = 11') }),
+  pave({ id: 'n5_07', domaine: 'Moitiés', libelle: 'Moitié de 16', attendu: 8,
+    scene: () => grand(`16 = ${TROU} + ${TROU}`), aide: () => deuxGroupes('point', 8, 8, 18) + grand('8 + 8 = 16') }),
+  pave({ id: 'n5_08', domaine: 'Vérification', libelle: 'Un ami a trouvé 45 + 20 = 47 : bon résultat ?', attendu: 65,
+    scene: () => calculAmi('45 + 20', 47), aide: () => barresCubes(6, 5, true) + grand('45 + 20 = 65') }),
+  pave({ id: 'n5_09', domaine: 'Doubles', libelle: 'Double de 50', attendu: 100,
+    scene: () => grand(`50 + 50 = ${TROU}`), aide: () => barresCubes(5, 0) + '<span class="plus">+</span>' + barresCubes(5, 0) + grand('50 + 50 = 100') }),
+  pave({ id: 'n5_10', domaine: 'Calcul', libelle: '56 + 9 (ajouter 10, enlever 1)', attendu: 65,
+    scene: () => grand(`56 + 9 = ${TROU}`), aide: () => grand('56 + 10 = 66') + grand('66 − 1 = 65') }),
+  pave({ id: 'n5_11', domaine: 'Calcul', libelle: '60 − 4', attendu: 56,
+    scene: () => grand(`60 − 4 = ${TROU}`), aide: () => bande(55, 60, 56) + grand('60 − 4 = 56') }),
+  pave({ id: 'n5_12', domaine: 'Problème (deux étapes)', libelle: '8 billes, + 7, puis − 5', attendu: 10,
+    scene: () => illustration('bille', 1, 110), aide: () => grand('8 + 7 = 15') + grand('15 − 5 = 10') }),
+  pave({ id: 'n5_13', domaine: 'Dizaines / unités', libelle: 'Dans 58, que vaut le chiffre 5 ?', attendu: 50,
+    scene: () => grand('<u>5</u>8'), aide: () => barresCubes(5, 8, true) + grand('58 = 50 + 8') }),
+  pave({ id: 'n5_14', domaine: 'Problème (multiplicatif)', libelle: '3 boîtes de 4 bonbons', attendu: 12,
+    scene: () => illustration('bonbon', 1, 120), aide: () => `<div class="probleme-aide">${[1, 2, 3].map(() => `<div>${rangee('bonbon', 4, 30)}</div>`).join('')}</div>` + grand('4 + 4 + 4 = 12') }),
+  pave({ id: 'n5_15', domaine: 'Calcul', libelle: '44 + 35', attendu: 79,
+    scene: () => grand(`44 + 35 = ${TROU}`), aide: () => barresCubes(7, 9, true) + grand('40 + 30 = 70') + grand('4 + 5 = 9') })
+];
+
 export const PARCOURS = {
   C: {
     code: 'C', titre: 'Décomposer et compléter',
     seances: [
       { id: 'C1', objectif: 'Décomposer jusqu\'à 7 avec cases vides visibles ; lire barres + cubes ; écrire 90', items: C1 },
       { id: 'C2', objectif: 'Décomposer 8 et 9, compléments à 10 avec la boîte ; chiffre des dizaines ; écrire 91', items: C2 },
-      { id: 'C3', objectif: 'Décompositions sans support (aide visuelle seulement après 2 essais) ; dictée 95', items: C3 }
+      { id: 'C3', objectif: 'Décompositions sans support (aide visuelle seulement après 2 essais) ; dictée 95', items: C3 },
+      { id: 'C4', objectif: 'Compléments à 5 et doubles avec les dés ; droite graduée 0-10 ; 8 = 5 + 3 avec les dés', items: C4 },
+      { id: 'C5', objectif: 'Doubles et compléments à 5 sans dé ; 7 et 9 = 5 + ? ; droite 0-20 ; moitié de 6 ; 12 + 13', items: C5 }
     ]
   },
   N: {
@@ -276,7 +413,9 @@ export const PARCOURS = {
     seances: [
       { id: 'N1', objectif: 'Suite et écriture 85-97 ; avant / après ; « de plus / de moins que » ; vérifier un calcul', items: N1 },
       { id: 'N2', objectif: 'Jusqu\'à 100 ; forme non canonique ; calcul en dizaines ; problème à deux étapes', items: N2 },
-      { id: 'N3', objectif: 'Comparaison inversée et écart ; décomposition ; à rebours ; deux étapes', items: N3 }
+      { id: 'N3', objectif: 'Comparaison inversée et écart ; décomposition ; à rebours ; deux étapes', items: N3 },
+      { id: 'N4', objectif: 'Doubles et moitiés ; droite graduée 40-60 ; additions sans retenue ; ajouter 9 ; état initial inconnu', items: N4 },
+      { id: 'N5', objectif: 'Presque-doubles ; addition avec retenue ; droite 70-90 ; valeur du chiffre ; problème multiplicatif', items: N5 }
     ]
   }
 };

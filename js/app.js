@@ -4,6 +4,7 @@ import { initAudio, dire, arreter, deverrouillerAudio, reecouter } from './audio
 import { afficher, $, $$, esc, ICONES } from './ui.js';
 import { dessin } from './themes.js';
 import { lancerTest, passationOuverte, testTermine } from './test/passation.js';
+import { lancerSeance, prochaineSeance } from './seances/seance.js';
 import { ouvrirParent } from './parent/parent.js';
 
 let audioDeverrouille = false;
@@ -35,8 +36,17 @@ function choixEnfant() {
 
 // Écran 2 : accueil de l'enfant, avec ses thèmes en décor.
 function accueilEnfant(p) {
-  const ouvert = passationOuverte(p.id);
-  const fini = testTermine(p.id);
+  // 1. Le test de départ d'abord (ou sa reprise). 2. Puis les séances du parcours choisi par le parent.
+  const testOuvert = passationOuverte(p.id);
+  const testFini = testTermine(p.id);
+  const enTest = testOuvert || !testFini;
+  const seance = enTest ? null : prochaineSeance(p);
+  let suite, jouer = null;
+  if (enTest) { suite = testOuvert ? 'accueil_reprise' : 'accueil_test'; jouer = () => lancerTest(p, retour); }
+  else if (seance) { suite = seance.passation ? 'accueil_reprise' : 'accueil_seance'; jouer = () => lancerSeance(p, retour); }
+  else suite = p.parcours ? 'accueil_tout_fini' : 'accueil_fini';
+  function retour() { accueilEnfant(S.getProfil(p.id)); }
+
   const decor = (p.themes || []).filter(t => t !== p.avatar).slice(0, 6)
     .map((t, i) => `<span class="deco deco-${i}">${dessin(t, 54)}</span>`).join('');
   afficher(`
@@ -46,13 +56,12 @@ function accueilEnfant(p) {
       <div class="avatar-geant">${dessin(p.avatar, 170)}</div>
       <div class="prenom-grand">${esc(p.prenom)}</div>
       <button class="btn-rond btn-oreille" id="ecouter" aria-label="Réécouter">${ICONES.oreille}</button>
-      ${fini && !ouvert ? '' : `<button class="btn-grand btn-vert" id="jouer" aria-label="Jouer">${ICONES.valider}</button>`}
+      ${jouer ? `<button class="btn-grand btn-vert" id="jouer" aria-label="Jouer">${ICONES.valider}</button>` : ''}
     </div>`, 'fond-' + p.avatar);
   $('#retour').onclick = choixEnfant;
   $('#ecouter').onclick = () => reecouter();
   const j = $('#jouer');
-  if (j) j.onclick = () => { arreter(); lancerTest(p, () => accueilEnfant(S.getProfil(p.id))); };
-  const suite = ouvert ? 'accueil_reprise' : (fini ? 'accueil_fini' : 'accueil_test');
+  if (j) j.onclick = () => { arreter(); jouer(); };
   dire(['bonjour_' + p.avatar, suite]);
 }
 

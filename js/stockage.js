@@ -172,6 +172,10 @@ export function journaliser(type, details = {}) {
   sauver();
 }
 
+// ---------- Réglages (exportés ; sans donnée sensible) ----------
+export function getReglages() { if (!etat.reglages) etat.reglages = {}; return etat.reglages; }
+export function definirReglage(cle, valeur) { getReglages()[cle] = valeur; sauver(); }
+
 // ---------- Identifiants ----------
 export function nouvelId(prefixe) {
   return prefixe + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);

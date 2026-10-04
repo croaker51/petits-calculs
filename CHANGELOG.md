@@ -2,8 +2,13 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
-## [Non publié] — séances S1.0
-- Contenu de 6 séances (2 parcours × 3 × 15 items), phrases, tests `test_seances.mjs`, fiche de relecture. Moteur de séance (J2) et voix à faire.
+## 0.3.0 — 2026-10-04
+- Séances d'entraînement : 2 parcours (C « Décomposer et compléter », N « Nombres jusqu'à 100 et problèmes ») de 5 séances × 15 exercices, choisis par enfant dans l'espace parent ; enchaînement automatique, pause et reprise.
+- Moteur commun au test et aux séances (deroule.js) ; le test reste identique.
+- Option « Je ne sais pas » (séances) : bouton « ? » après la consigne, aide et explication immédiates, classement à part.
+- Dés à 5 points (compléments à 5, doubles), droite graduée de 1 en 1.
+- Voix : 350 phrases en voix clonée, contrôlées par transcription ; 4 phrases en voix de secours en attendant leur regénération (c2_01_e, n3_11_c, n3_12_c, n5_05_c).
+- Espace parent : parcours par enfant, liste et résultats des séances, écran « Suivi » (compétences CP → CE2, acquis / en cours / non acquis, ★ essentielles, période).
 
 ## 0.2.3 — 2026-10-04
 - Correctif : les profils disparaissaient à chaque réouverture. Double sauvegarde (localStorage + IndexedDB), plus jamais d'écriture d'un état vide au démarrage, réécriture en arrière-plan, stockage persistant demandé.

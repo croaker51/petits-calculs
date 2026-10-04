@@ -222,3 +222,50 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .grand-texte.long .trou { min-width: 40px; }
 .alerte-perte { font-size: 14px; text-align: center; margin: 4px 0; padding: 6px 10px; }
 .alerte-perte .btn-texte { min-height: 44px; }
+/* Séances S1.1 : dés et droite graduée */
+.de { display: block; }
+.droite-graduee { display: block; max-width: 100%; height: auto; }
+/* ---------- Suivi du niveau (espace parent) ---------- */
+.choix-periode { display: flex; gap: 4px; flex-wrap: wrap; }
+.choix-periode .actif { background: var(--bleu); color: #fff; }
+.resume-suivi { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+.resume-suivi > div { background: #fff; border-radius: 12px; padding: 8px; text-align: center; box-shadow: var(--ombre); }
+.resume-suivi b { display: block; font-size: 26px; }
+.resume-suivi small { font-size: 12px; color: var(--doux); }
+.resume-suivi .alerte-num b { color: #c0392b; }
+.ligne-suivi { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--ligne); }
+.ligne-suivi small { display: block; color: var(--doux); font-size: 12px; }
+.ligne-suivi .lib-comp { font-size: 14px; }
+.ligne-suivi .pos { font-weight: 700; }
+.pastille { flex: 0 0 16px; height: 16px; border-radius: 50%; margin-top: 3px; border: 2px solid #c9c1b4; background: #fff; }
+.st-en-cours .pastille { background: #f6c945; border-color: #d9a520; }
+.st-maitrisee .pastille { background: var(--vert); border-color: var(--vert-fonce); }
+.pos-attendue-non-acquise .pos { color: #c0392b; }
+.pos-acquise-avant-echeance .pos, .pos-acquise .pos, .pos-maitrisee-hors-reperes .pos { color: var(--vert-fonce); }
+.tab-evolution { width: 100%; min-width: 0; }
+.tab-evolution th, .tab-evolution td { width: auto; }
+.bloc-classe { margin: 8px 0; border-top: 1px solid var(--ligne); padding-top: 6px; }
+.bloc-classe summary { min-height: 48px; display: flex; flex-direction: column; justify-content: center; cursor: pointer; }
+.bloc-classe summary small { color: var(--doux); font-size: 12px; }
+.bloc-classe h4 { margin: 12px 0 2px; font-size: 14px; color: var(--doux); }
+.etoile-ess { color: #e0a100; }
+.ligne-suivi.essentielle .lib-comp { font-weight: 600; }
+.ligne-suivi .statut { font-weight: 700; color: var(--encre); }
+.st-acquis .pastille { background: var(--vert); border-color: var(--vert-fonce); }
+.st-non-acquis .pastille { background: #e46a6a; border-color: #c0392b; }
+.st-non-acquis .statut { color: #c0392b; }
+.st-non-travaillee { opacity: .55; }
+.rouge { color: #c0392b; }
+.resume-suivi b span { font-size: 15px; color: var(--doux); font-weight: 600; }
+.resume-suivi .ess b { color: #b07d00; }
+
+/* ---------- v0.3.0 : moteur de séances ---------- */
+.zone-nsp { display: flex; justify-content: center; margin-top: 6px; }
+.zone-nsp[hidden] { display: none; }
+.btn-ne-sais-pas { color: var(--orange); }
+.choix-parcours { display: flex; flex-direction: column; gap: 8px; }
+.case-choix.large { width: 100%; text-align: left; padding: 10px 14px; display: block; }
+.case-choix.large small { display: block; }
+.kpi.cl-ne-sait-pas b { color: var(--orange); }
+/* Scènes avec un nombre + barres (47, 58, 63) : tenir sur 375×667 avec le pavé. */
+.ecran-item .scene .grand-texte.long + .dizaines-unites { min-height: 0; transform: scale(.9); transform-origin: top center; margin-bottom: -12px; }
