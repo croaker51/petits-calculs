@@ -211,3 +211,14 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   .grand-texte { font-size: 44px; }
   .cadre-nuage { height: 200px; }
 }
+
+/* ---------- Séances d'entraînement (S1.0) ---------- */
+/* Emplacement vide « il en manque » : même taille que les dessins, en pointillés. */
+.emplacement-vide { display: inline-block; border: 3px dashed var(--orange); border-radius: 50%; background: #fff7ee; box-sizing: border-box; }
+/* Réponse fausse d'un « ami » : toujours barrée, jamais présentée comme juste. */
+.faux { color: var(--rouge-doux); text-decoration-thickness: 5px; }
+.dictee .trou { min-width: 120px; }
+.grand-texte.long { font-size: 34px; white-space: nowrap; }
+.grand-texte.long .trou { min-width: 40px; }
+.alerte-perte { font-size: 14px; text-align: center; margin: 4px 0; padding: 6px 10px; }
+.alerte-perte .btn-texte { min-height: 44px; }

@@ -2,6 +2,14 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## [Non publié] — séances S1.0
+- Contenu de 6 séances (2 parcours × 3 × 15 items), phrases, tests `test_seances.mjs`, fiche de relecture. Moteur de séance (J2) et voix à faire.
+
+## 0.2.3 — 2026-10-04
+- Correctif : les profils disparaissaient à chaque réouverture. Double sauvegarde (localStorage + IndexedDB), plus jamais d'écriture d'un état vide au démarrage, réécriture en arrière-plan, stockage persistant demandé.
+- Diagnostic du stockage dans l'espace parent et dans l'export ; restauration d'une sauvegarde proposée au démarrage si les données ont disparu.
+- Contenu des séances S1.0 présent dans le code mais pas encore accessible (moteur à venir).
+
 ## 0.2.2 — 2026-10-03
 - Correctif : l'étoile / le « ? » de retour ne masquent plus la zone de saisie (déplacés en haut à droite, disparition automatique).
 - Correctif : l'export iPhone ne crée plus de fichier texte parasite en plus du JSON.

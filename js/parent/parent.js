@@ -16,11 +16,12 @@ export function ouvrirParent(onRetour) {
 }
 
 // ---------- Code ----------
-function paveCode(titre, sousTitre, onComplet) {
+function paveCode(titre, sousTitre, onComplet, complement = '') {
   afficher(`
     <div class="parent ecran-code">
       <h1>${titre}</h1>
       <p class="aide-texte">${sousTitre}</p>
+      ${complement}
       <div class="points-code" id="points">${'<span></span>'.repeat(4)}</div>
       <div class="pave pave-code">
         ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button class="touche" data-n="${n}">${n}</button>`).join('')}
@@ -50,7 +51,23 @@ function ecranCode() {
   });
 }
 
+// Diagnostic du stockage (v0.2.3) : sert à comprendre une perte de données sur l'iPhone.
+function texteDiagnostic() {
+  const d = S.getDiagnostic();
+  const h = iso => iso ? new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—';
+  return `Lancement n° ${d.lancement} · écran d'accueil : ${d.ecranAccueil ? 'oui' : 'non'} · stockage protégé : ${esc(d.persistant)}<br>
+    Au démarrage — localStorage : ${esc(d.localStorage)} · IndexedDB : ${esc(d.indexedDB)} · source : ${esc(d.source)}<br>
+    Dernière écriture : ${h(d.derniereEcriture)} (localStorage ${esc(d.ecritureLS || '—')}, IndexedDB ${esc(d.ecritureIDB || '—')})
+    ${d.alertes.map(a => `<br><b>${esc(a)}</b>`).join('')}`;
+}
+
 function ecranCreationCode() {
+  const d = S.getDiagnostic();
+  // Démarrage à vide alors que l'appli a déjà servi : on le dit, et on propose de restaurer.
+  const perte = !S.getProfils().length && d.lancementsPrecedents > 0;
+  const complement = perte ? `
+      <div class="alerte alerte-perte">Les données ont disparu (ouverture n° ${d.lancement} sur cet iPhone).
+      <label class="btn-texte btn-fichier">Restaurer une sauvegarde (.json)<input type="file" id="restaurer" accept=".json,application/json" hidden></label></div>` : '';
   paveCode('Bienvenue', 'Choisissez un code parent à 4 chiffres.', c1 => {
     paveCode('Confirmation', 'Entrez le même code une 2e fois.', async c2 => {
       if (c1 !== c2) { ecranCreationCode(); $('#message').textContent = 'Les deux codes sont différents. Recommencez.'; return; }
@@ -59,7 +76,12 @@ function ecranCreationCode() {
       if (!S.getProfils().length) return editerProfil(null);
       tableauDeBord();
     });
-  });
+  }, complement);
+  const r = $('#restaurer');
+  if (r) r.onchange = e => lireFichier(e, () => {
+    ecranCreationCode();
+    $('#message').textContent = 'Sauvegarde restaurée. Choisissez maintenant le code parent.';
+  }, err => { $('#message').textContent = 'Restauration impossible : ' + err.message; });
 }
 
 // ---------- Tableau de bord ----------
@@ -107,6 +129,10 @@ function tableauDeBord() {
         <button class="btn-texte" id="voix">Tester la voix</button>
         <button class="btn-texte" id="changer-code">Changer le code</button>
         <p class="aide-texte" id="info-version">Version ${APP_VERSION} · format de données ${SCHEMA_VERSION}</p>
+      </section>
+      <section>
+        <h2>Stockage (diagnostic)</h2>
+        <p class="aide-texte">${texteDiagnostic()}</p>
       </section>
     </div>`, 'mode-parent');
 
@@ -248,18 +274,20 @@ async function exporter() {
   msg.textContent = 'Fichier téléchargé : ' + nom;
 }
 
-function importer(e) {
+function lireFichier(e, onSucces, onErreur) {
   const f = e.target.files && e.target.files[0];
   if (!f) return;
   const lecteur = new FileReader();
   lecteur.onload = () => {
-    try {
-      S.importer(JSON.parse(lecteur.result));
-      tableauDeBord();
-      $('#msg-export').textContent = 'Sauvegarde importée.';
-    } catch (err) {
-      $('#msg-export').textContent = 'Import impossible : ' + err.message;
-    }
+    try { S.importer(JSON.parse(lecteur.result)); onSucces(); }
+    catch (err) { onErreur(err); }
   };
   lecteur.readAsText(f);
+}
+
+function importer(e) {
+  lireFichier(e, () => {
+    tableauDeBord();
+    $('#msg-export').textContent = 'Sauvegarde importée.';
+  }, err => { $('#msg-export').textContent = 'Import impossible : ' + err.message; });
 }

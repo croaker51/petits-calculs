@@ -57,7 +57,11 @@ function accueilEnfant(p) {
 }
 
 async function demarrer() {
-  S.charger();
+  await S.charger();
+  // iOS peut tuer l'appli sans prévenir : on réécrit l'état quand elle passe en arrière-plan.
+  const ecrireAvantSortie = () => { if (S.aDesDonnees()) S.sauver(); };
+  addEventListener('pagehide', ecrireAvantSortie);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') ecrireAvantSortie(); });
   await initAudio();
   // Enregistrement du service worker (hors-ligne). Ignoré si non disponible.
   if ('serviceWorker' in navigator && location.protocol === 'https:') {

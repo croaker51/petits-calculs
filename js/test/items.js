@@ -8,48 +8,12 @@
 //   attendu (valeur affichée au parent), verifier(reponse) -> booléen,
 //   scene(ctx) / aide(ctx, reponse) -> HTML.
 import { dessin } from '../themes.js';
+import { objetsPlaces, rangee, barresCubes, boiteDe10, bande, grand } from '../rendu.js';
 
 export const VERSION_TEST = 'T1.0';
 
-// ---------- Aides de rendu (chaînes HTML) ----------
-function objetsPlaces(nom, positions, taille, numeros = false) {
-  return `<div class="champ-objets">` + positions.map(([x, y], i) =>
-    `<div class="objet" style="left:${x}%;top:${y}%">${dessin(nom, taille)}${numeros ? `<span class="num-objet">${i + 1}</span>` : ''}</div>`
-  ).join('') + `</div>`;
-}
-
-function rangee(nom, n, taille = 40, barres = 0) {
-  let h = '<div class="rangee">';
-  for (let i = 0; i < n; i++) h += `<span class="${i < barres ? 'barre-objet' : ''}">${dessin(nom, taille)}</span>`;
-  return h + '</div>';
-}
-
-export function barresCubes(barres, cubes, etiquettes = false) {
-  let h = '<div class="dizaines-unites">';
-  for (let b = 0; b < barres; b++) {
-    h += '<div class="barre">' + '<i></i>'.repeat(10) + (etiquettes ? `<b>${(b + 1) * 10}</b>` : '') + '</div>';
-  }
-  h += '<div class="cubes">';
-  for (let c = 0; c < cubes; c++) h += '<div class="cube"></div>';
-  return h + '</div></div>';
-}
-
-function boiteDe10(pleines, surlignees = 0) {
-  let h = '<div class="boite10">';
-  for (let i = 0; i < 10; i++) {
-    const cls = i < pleines ? 'pleine' : (i < pleines + surlignees ? 'manque' : '');
-    h += `<span class="${cls}"></span>`;
-  }
-  return h + '</div>';
-}
-
-function bande(debut, fin, cible) {
-  let h = '<div class="bande">';
-  for (let n = debut; n <= fin; n++) h += `<span class="${n === cible ? 'cible' : ''}">${n}</span>`;
-  return h + '</div>';
-}
-
-const grand = t => `<div class="grand-texte">${t}</div>`;
+// Aides de rendu : déplacées dans ../rendu.js (partagées avec les séances). Items inchangés.
+export { barresCubes };
 
 // Constellation du dé (5) et nuage de 14 objets : positions fixes en %.
 const DE_CINQ = [[18, 18], [62, 18], [40, 40], [18, 62], [62, 62]];
