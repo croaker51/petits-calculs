@@ -2,6 +2,11 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.3.4 — 2026-10-04
+- La scène ne dessine plus la réponse : plus d'emplacements vides (c1_02, c1_03, c1_05, c1_12, c2_03 : seuls les objets présents restent), plus de boîte de 10 dont les cases vides sont le nombre cherché (c2_01, c2_02, c2_05, c2_15, c3_01, c4_15 : calcul écrit seul). Ces supports passent dans l'aide, après 2 erreurs ou « ? ».
+- Consignes c2_01, c2_02, c2_05, c2_15, c4_15 réécrites (plus de renvoi à la boîte) ; voix de secours en attendant la génération.
+- Test automatique : aucune scène ne peut contenir d'emplacement vide ni de boîte qui donne la réponse.
+
 ## 0.3.3 — 2026-10-04
 - Séances S1.3 (parcours C), d'après le cahier d'école : nombre manquant en PREMIÈRE position (« ? + 3 = 5 » avec un dé caché, puis sans support), presque-doubles dans les deux sens (4 + 5 puis 5 + 4), attention au signe moins (8 − 2). Remplacent c2_04, c2_07, c2_08, c3_03, c3_05, c3_06, c3_08 (lecture et écriture de nombres déjà réussies en classe).
 - 29 phrases en voix de secours en attendant leur génération.

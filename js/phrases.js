@@ -100,15 +100,15 @@ export const PHRASES = {
   c1_15_e: "Cinq, puis six, sept : il faut en ajouter deux. Cinq plus deux égale sept.",
 
   // --- Parcours C, séance 2 ---
-  c2_01_c: "La boîte a dix cases. Combien de cases sont vides ?",
+  c2_01_c: "Il en faut dix. Il y en a huit. Combien en manque-t-il ?",
   c2_01_e: "Huit cases sont pleines, et il reste deux cases vides. Huit plus deux égale dix.",
-  c2_02_c: "Combien de cases faut-il encore remplir, pour que la boîte soit pleine ?",
+  c2_02_c: "Sept, plus combien, égale dix ?",
   c2_02_e: "Sept cases sont pleines. Il en faut encore trois. Sept plus trois égale dix.",
   c2_03_c: "Il faut huit étoiles. Il y en a déjà cinq. Combien en manque-t-il ?",
   c2_03_e: "Cinq étoiles, plus trois étoiles, ça fait huit. Huit, c'est cinq plus trois.",
   c2_04_c: "Un dé est caché. L'autre dé a trois points. En tout, il y a cinq points. Combien de points sur le dé caché ?",
   c2_04_e: "Deux points, plus trois points, ça fait cinq. Sur le dé caché, il y a deux points.",
-  c2_05_c: "Quatre, plus combien, égale dix ? Regarde les cases vides de la boîte.",
+  c2_05_c: "Quatre, plus combien, égale dix ?",
   c2_05_e: "Il y a six cases vides. Quatre plus six égale dix.",
   c2_06_c: "On veut neuf billes. On en a déjà cinq. Combien faut-il en ajouter ?",
   c2_06_e: "Cinq, puis six, sept, huit, neuf : il faut en ajouter quatre. Cinq plus quatre égale neuf.",
@@ -128,7 +128,7 @@ export const PHRASES = {
   c2_13_e: "Cinq étoiles, plus quatre étoiles : ça fait neuf étoiles.",
   c2_14_c: "Touche le nombre le plus petit.",
   c2_14_e: "Cinquante-cinq et cinquante-sept ont tous les deux cinq dizaines. Cinquante-cinq a moins de petits cubes : c'est le plus petit.",
-  c2_15_c: "Dix, c'est trois plus combien ? Regarde les cases vides de la boîte.",
+  c2_15_c: "Dix, c'est trois plus combien ?",
   c2_15_e: "Il y a sept cases vides. Dix, c'est trois plus sept.",
 
   // --- Parcours C, séance 3 ---
@@ -288,7 +288,7 @@ export const PHRASES = {
   c4_13_e: "Quatre plus quatre, ça fait huit. C'est le double de quatre.",
   c4_14_c: "Léa a cinq bonbons. Elle en mange. Maintenant, il lui en reste deux. Combien de bonbons a-t-elle mangés ?",
   c4_14_e: "Elle avait cinq bonbons. Il en reste deux. Elle en a mangé trois, car deux plus trois, ça fait cinq.",
-  c4_15_c: "Six, plus combien, égale dix ? Regarde les cases vides de la boîte.",
+  c4_15_c: "Six, plus combien, égale dix ?",
   c4_15_e: "Il y a quatre cases vides. Six plus quatre égale dix.",
 
   // --- Parcours C, séance 5 ---

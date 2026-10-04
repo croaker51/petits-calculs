@@ -79,13 +79,13 @@ const C1 = [
   pave({ id: 'c1_01', domaine: 'Quantités', libelle: 'Boîte de 10 : 7 cases pleines', attendu: 7,
     scene: () => boiteDe10(7), aide: () => boiteDe10(7) + grand('5 + 2 = 7') }),
   pave({ id: 'c1_02', domaine: 'Décomposition', libelle: 'Il en faut 5, il y en a 3 (cases vides visibles)', attendu: 2,
-    scene: () => emplacements('bonbon', 3, 5), aide: () => deuxGroupes('bonbon', 3, 2) + grand('3 + 2 = 5') }),
+    scene: () => emplacements('bonbon', 3, 3), aide: () => deuxGroupes('bonbon', 3, 2) + grand('3 + 2 = 5') }),
   pave({ id: 'c1_03', domaine: 'Décomposition', libelle: 'Il en faut 6, il y en a 4 (cases vides visibles)', attendu: 2,
-    scene: () => emplacements('etoile', 4, 6), aide: () => deuxGroupes('etoile', 4, 2) + grand('4 + 2 = 6') }),
+    scene: () => emplacements('etoile', 4, 4), aide: () => deuxGroupes('etoile', 4, 2) + grand('4 + 2 = 6') }),
   pave({ id: 'c1_04', domaine: 'Dizaines / unités', libelle: 'Lire 2 barres + 4 cubes (24)', attendu: 24,
     scene: () => barresCubes(2, 4), aide: () => barresCubes(2, 4, true) + grand('24') }),
   pave({ id: 'c1_05', domaine: 'Décomposition', libelle: 'Il en faut 7, il y en a 4 (cases vides visibles)', attendu: 3,
-    scene: () => emplacements('bille', 4, 7, 36), aide: () => deuxGroupes('bille', 4, 3) + grand('4 + 3 = 7') }),
+    scene: () => emplacements('bille', 4, 4, 36), aide: () => deuxGroupes('bille', 4, 3) + grand('4 + 3 = 7') }),
   pave({ id: 'c1_06', domaine: 'Calcul', libelle: '5 + 2', attendu: 7,
     scene: () => grand(`5 + 2 = ${TROU}`), aide: () => grand('5 + 2 = 7') + deuxGroupes('point', 5, 2, 26) }),
   pave({ id: 'c1_07', domaine: 'Dizaines / unités', libelle: 'Lire 3 barres + 5 cubes (35)', attendu: 35,
@@ -98,7 +98,7 @@ const C1 = [
   pave({ id: 'c1_11', domaine: 'Problème (ajout)', libelle: '4 billes, on en donne 2', attendu: 6,
     scene: () => illustration('bille', 1, 110), aide: () => deuxGroupes('bille', 4, 2) + grand('4 + 2 = 6') }),
   pave({ id: 'c1_12', domaine: 'Décomposition', libelle: 'Il en faut 6, il y en a 2 (cases vides visibles)', attendu: 4,
-    scene: () => emplacements('carte', 2, 6, 40), aide: () => deuxGroupes('carte', 2, 4, 28) + grand('2 + 4 = 6') }),
+    scene: () => emplacements('carte', 2, 2, 40), aide: () => deuxGroupes('carte', 2, 4, 28) + grand('2 + 4 = 6') }),
   choix({ id: 'c1_13', domaine: 'Comparaison', libelle: 'Le plus grand entre 24 et 42', choix: [24, 42], attendu: 42,
     aide: () => compareBC(42, 24) }),
   pave({ id: 'c1_14', domaine: 'Problème (retrait)', libelle: '7 bonbons, on en donne 2', attendu: 5,
@@ -109,16 +109,16 @@ const C1 = [
 
 const C2 = [
   pave({ id: 'c2_01', domaine: 'Compléments à 10', libelle: 'Boîte de 10 : 8 pleines, combien de vides ?', attendu: 2,
-    scene: () => boiteDe10(8), aide: () => boiteDe10(8, 2) + grand('8 + 2 = 10') }),
+    scene: () => grand(`8 + ${TROU} = 10`), aide: () => boiteDe10(8, 2) + grand('8 + 2 = 10') }),
   pave({ id: 'c2_02', domaine: 'Compléments à 10', libelle: 'Boîte de 10 : 7 pleines, combien pour faire 10 ?', attendu: 3,
-    scene: () => boiteDe10(7), aide: () => boiteDe10(7, 3) + grand('7 + 3 = 10') }),
+    scene: () => grand(`7 + ${TROU} = 10`), aide: () => boiteDe10(7, 3) + grand('7 + 3 = 10') }),
   pave({ id: 'c2_03', domaine: 'Décomposition', libelle: 'Il en faut 8, il y en a 5 (cases vides visibles) — reprise de i10', attendu: 3,
-    scene: () => emplacements('etoile', 5, 8, 36), aide: () => deuxGroupes('etoile', 5, 3) + grand('8 = 5 + 3') }),
+    scene: () => emplacements('etoile', 5, 5, 36), aide: () => deuxGroupes('etoile', 5, 3) + grand('8 = 5 + 3') }),
   // S1.3 : terme manquant en PREMIÈRE position (erreur du cahier d'école : « __ + 3 = 5 » → 8).
   pave({ id: 'c2_04', domaine: 'Décomposition', libelle: 'Dés : ? + 3 = 5 (dé caché en premier)', attendu: 2,
     scene: () => deuxDes(null, 3), aide: () => deuxDes(2, 3) + grand('2 + 3 = 5') }),
   pave({ id: 'c2_05', domaine: 'Compléments à 10', libelle: '4 + ? = 10 (boîte de 10 visible)', attendu: 6,
-    scene: () => grand(`4 + ${TROU} = 10`) + boiteDe10(4), aide: () => boiteDe10(4, 6) + grand('4 + 6 = 10') }),
+    scene: () => grand(`4 + ${TROU} = 10`), aide: () => boiteDe10(4, 6) + grand('4 + 6 = 10') }),
   pave({ id: 'c2_06', domaine: 'Décomposition', libelle: '5 + ? = 9 (objets visibles)', attendu: 4,
     scene: () => grand(`5 + ${TROU} = 9`) + rangee('bille', 5, 40), aide: () => deuxGroupes('bille', 5, 4) + grand('5 + 4 = 9') }),
   pave({ id: 'c2_07', domaine: 'Décomposition', libelle: 'Dés : ? + 1 = 3 (dé caché en premier)', attendu: 2,
@@ -137,12 +137,12 @@ const C2 = [
   choix({ id: 'c2_14', domaine: 'Comparaison', libelle: 'Le plus petit parmi 57, 75, 55', choix: [57, 75, 55], attendu: 55,
     aide: () => compareBC(55, 57) }),
   pave({ id: 'c2_15', domaine: 'Compléments à 10', libelle: '10 = 3 + ? (boîte de 10 visible)', attendu: 7,
-    scene: () => grand(`10 = 3 + ${TROU}`) + boiteDe10(3), aide: () => boiteDe10(3, 7) + grand('10 = 3 + 7') })
+    scene: () => grand(`10 = 3 + ${TROU}`), aide: () => boiteDe10(3, 7) + grand('10 = 3 + 7') })
 ];
 
 const C3 = [
   pave({ id: 'c3_01', domaine: 'Compléments à 10', libelle: '5 + ? = 10 (boîte de 10 visible)', attendu: 5,
-    scene: () => grand(`5 + ${TROU} = 10`) + boiteDe10(5), aide: () => boiteDe10(5, 5) + grand('5 + 5 = 10') }),
+    scene: () => grand(`5 + ${TROU} = 10`), aide: () => boiteDe10(5, 5) + grand('5 + 5 = 10') }),
   pave({ id: 'c3_02', domaine: 'Décomposition', libelle: '8 = 5 + ? sans support (reprise de i10)', attendu: 3,
     scene: () => grand(`8 = 5 + ${TROU}`), aide: () => emplacements('point', 5, 8, 30) + grand('8 = 5 + 3') }),
   pave({ id: 'c3_03', domaine: 'Décomposition', libelle: '? + 3 = 5 sans support (terme manquant en premier)', attendu: 2,
@@ -303,7 +303,7 @@ const C4 = [
   pave({ id: 'c4_14', domaine: 'Sens des opérations', libelle: '5 bonbons, elle en mange, il en reste 2 : combien mangés ?', attendu: 3,
     scene: () => illustration('bonbon', 1, 120), aide: () => rangee('bonbon', 5, 40, 3) + grand('5 − 3 = 2') }),
   pave({ id: 'c4_15', domaine: 'Compléments à 10', libelle: '6 + ? = 10 avec la boîte (reprise de i09)', attendu: 4,
-    scene: () => grand(`6 + ${TROU} = 10`) + boiteDe10(6), aide: () => boiteDe10(6, 4) + grand('6 + 4 = 10') })
+    scene: () => grand(`6 + ${TROU} = 10`), aide: () => boiteDe10(6, 4) + grand('6 + 4 = 10') })
 ];
 
 const C5 = [
