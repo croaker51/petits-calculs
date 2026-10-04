@@ -2,6 +2,10 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.3.2 — 2026-10-04
+- Séances S1.2 (parcours N) : additions de dizaines reprises pas à pas. N1 à N4 : barres de dix visibles à l'écran (47 + 10, 30 + 20, 36 + 20, 23 + 14, 34 + 10, 32 + 25, 20 + 20, vérifications). N5 seulement sans barres (50 + 30, 56 + 10). Retirés pour plus tard : 70 − 20, 27 + 15 (retenue), ajouter 9.
+- 15 phrases en voix de secours en attendant leur génération (11 nouvelles + 4 refusées au contrôle).
+
 ## 0.3.1 — 2026-10-04
 - Correctif : l'oreille redit la consigne de l'exercice à tout moment, y compris après une 1re erreur (elle ne redisait que « Vérifie »). Pendant l'aide, elle redit l'explication.
 

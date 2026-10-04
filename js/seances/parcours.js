@@ -18,7 +18,7 @@ import {
   suiteATrou, dictee, calculAmi, ligneAide, illustration, de, deuxDes, droiteGraduee
 } from '../rendu.js';
 
-export const VERSION_SEANCES = 'S1.1'; // S1.0 : séances 1-3 ; S1.1 : + séances 4-5
+export const VERSION_SEANCES = 'S1.2'; // S1.0 : séances 1-3 ; S1.1 : + séances 4-5 ; S1.2 : additions de dizaines du parcours N reprises avec les barres
 
 // ---------- Fabriques (la vérification est toujours une égalité stricte, ou une tolérance pour la ligne) ----------
 const pave = o => ({ type: 'pave', verifier: r => r === o.attendu, ...o });
@@ -64,6 +64,11 @@ const compareBC = (a, b) =>
   `<div class="comparaison"><div>${grand(String(a))}${barresCubes(Math.floor(a / 10), a % 10)}</div><div>${grand(String(b))}${barresCubes(Math.floor(b / 10), b % 10)}</div></div>`;
 
 // Idem avec un nom de personnage au-dessus de chaque nombre.
+// Addition de dizaines MONTRÉE avec les barres (session 4 : hésitations observées sur les dizaines →
+// on passe par le concret avant le calcul sans support). a + b, chaque nombre en barres + cubes.
+const additionBC = (a, b) =>
+  `<div class="groupes addition-bc">${barresCubes(Math.floor(a / 10), a % 10)}<span class="plus">+</span>${barresCubes(Math.floor(b / 10), b % 10)}</div>`;
+
 const deuxBC = (p1, a, p2, b) =>
   `<div class="comparaison"><div><b>${p1}</b>${barresCubes(Math.floor(a / 10), a % 10)}</div><div><b>${p2}</b>${barresCubes(Math.floor(b / 10), b % 10)}</div></div>`;
 
@@ -192,8 +197,8 @@ const N1 = [
   pave({ id: 'n1_11', domaine: 'Problème (comparaison)', libelle: 'Léa 9 cartes, Tom 3 de MOINS', attendu: 6,
     scene: () => illustration('carte', 2, 70), aide: () => deuxRangees('carte', 6, 9) + grand('9 − 3 = 6') }),
   ligne('n1_12', 90),
-  pave({ id: 'n1_13', domaine: 'Calcul (dizaines)', libelle: '47 + 10', attendu: 57,
-    scene: () => grand(`47 + 10 = ${TROU}`), aide: () => barresCubes(5, 7, true) + grand('47 + 10 = 57') }),
+  pave({ id: 'n1_13', domaine: 'Calcul (dizaines)', libelle: '47 + 10 (barres visibles)', attendu: 57,
+    scene: () => grandLong(`47 + 10 = ${TROU}`) + additionBC(47, 10), aide: () => barresCubes(5, 7, true) + grand('47 + 10 = 57') }),
   pave({ id: 'n1_14', domaine: 'Suite logique', libelle: '95, 90, 85, … ? (à rebours de 5 en 5)', attendu: 80,
     scene: () => grandLong(`95 · 90 · 85 · ${TROU}`), aide: () => grand('95 · 90 · 85 · 80') }),
   pave({ id: 'n1_15', domaine: 'Problème (retrait)', libelle: '12 bonbons, on en mange 5', attendu: 7,
@@ -212,12 +217,12 @@ const N2 = [
     scene: () => grand(`9 + 6 = ${TROU}`), aide: () => boiteDe10(9, 1) + rangee('point', 5, 30) + grand('9 + 6 = 15') }),
   pave({ id: 'n2_06', domaine: 'Problème (comparaison)', libelle: 'Tom 15 billes, Léa 5 de plus', attendu: 20,
     scene: () => illustration('bille', 2, 70), aide: () => deuxBC('Tom', 15, 'Léa', 20) + grand('15 + 5 = 20') }),
-  pave({ id: 'n2_07', domaine: 'Calcul (dizaines)', libelle: '70 − 20', attendu: 50,
-    scene: () => grand(`70 − 20 = ${TROU}`), aide: () => barresCubes(5, 0, true) + grand('70 − 20 = 50') }),
+  pave({ id: 'n2_07', domaine: 'Calcul (dizaines)', libelle: '30 + 20 (barres visibles)', attendu: 50,
+    scene: () => grandLong(`30 + 20 = ${TROU}`) + additionBC(30, 20), aide: () => barresCubes(5, 0, true) + grand('3 dizaines + 2 dizaines = 5 dizaines') + grand('30 + 20 = 50') }),
   pave({ id: 'n2_08', domaine: 'Décomposition', libelle: '64 = 60 + ?', attendu: 4,
     scene: () => grand(`64 = 60 + ${TROU}`), aide: () => barresCubes(6, 4, true) + grand('64 = 60 + 4') }),
   pave({ id: 'n2_09', domaine: 'Vérification', libelle: 'Un ami a trouvé 40 + 5 = 90 : bon résultat ?', attendu: 45,
-    scene: () => calculAmi('40 + 5', 90), aide: () => barresCubes(4, 5, true) + grand('40 + 5 = 45') }),
+    scene: () => calculAmi('40 + 5', 90) + additionBC(40, 5), aide: () => barresCubes(4, 5, true) + grand('40 + 5 = 45') }),
   pave({ id: 'n2_10', domaine: 'Problème (deux étapes)', libelle: '5 billes, + 4, puis − 2', attendu: 7,
     scene: () => illustration('bille', 1, 110), aide: () => rangee('bille', 9, 30, 2) + grand('5 + 4 = 9') + grand('9 − 2 = 7') }),
   choix({ id: 'n2_11', domaine: 'Comparaison', libelle: 'Le plus petit parmi 86, 68, 80, 66', choix: [86, 68, 80, 66], attendu: 66,
@@ -238,13 +243,13 @@ const N3 = [
     scene: () => dictee(), aide: () => barresCubes(9, 1, true) + grand('91') }),
   pave({ id: 'n3_03', domaine: 'Décomposition', libelle: '52 = ? + 2', attendu: 50,
     scene: () => grand(`52 = ${TROU} + 2`), aide: () => barresCubes(5, 2, true) + grand('52 = 50 + 2') }),
-  pave({ id: 'n3_04', domaine: 'Calcul (dizaines)', libelle: '36 + 20', attendu: 56,
-    scene: () => grand(`36 + 20 = ${TROU}`), aide: () => barresCubes(5, 6, true) + grand('36 + 20 = 56') }),
+  pave({ id: 'n3_04', domaine: 'Calcul (dizaines)', libelle: '36 + 20 (barres visibles)', attendu: 56,
+    scene: () => grandLong(`36 + 20 = ${TROU}`) + additionBC(36, 20), aide: () => barresCubes(5, 6, true) + grand('36 + 20 = 56') }),
   pave({ id: 'n3_05', domaine: 'Problème (écart)', libelle: 'Tom 7, Léa 10 : combien de plus ?', attendu: 3,
     scene: () => illustration('bille', 2, 70), aide: () => deuxRangees('bille', 7, 10) + grand('7 + 3 = 10') }),
   construire('n3_06', 85),
   pave({ id: 'n3_07', domaine: 'Vérification', libelle: 'Un ami a trouvé 50 + 20 = 52 : bon résultat ?', attendu: 70,
-    scene: () => calculAmi('50 + 20', 52), aide: () => barresCubes(7, 0, true) + grand('50 + 20 = 70') }),
+    scene: () => calculAmi('50 + 20', 52) + additionBC(50, 20), aide: () => barresCubes(7, 0, true) + grand('50 + 20 = 70') }),
   pave({ id: 'n3_08', domaine: 'Calcul', libelle: '15 − 6', attendu: 9,
     scene: () => grand(`15 − 6 = ${TROU}`), aide: () => rangee('point', 15, 20, 6) + grand('15 − 6 = 9') }),
   pave({ id: 'n3_09', domaine: 'Problème (comparaison inversée)', libelle: 'Léa 12 cartes, elle en a 4 de plus que Tom', attendu: 8,
@@ -342,24 +347,24 @@ const N4 = [
     scene: () => rangee('bille', 10, 30), aide: () => deuxGroupes('bille', 5, 5, 28) + grand('5 + 5 = 10') }),
   pave({ id: 'n4_05', domaine: 'Droite graduée', libelle: 'Droite 40–60 graduée de 1 en 1 : la flèche montre 47', attendu: 47,
     scene: () => droiteGraduee(40, 60, [40, 50, 60], 47), aide: () => droiteGraduee(40, 60, [40, 45, 47, 50, 60], 47) + grand('45, 46, 47') }),
-  pave({ id: 'n4_06', domaine: 'Calcul', libelle: '23 + 14', attendu: 37,
-    scene: () => grand(`23 + 14 = ${TROU}`), aide: () => barresCubes(3, 7, true) + grand('20 + 10 = 30') + grand('3 + 4 = 7') }),
+  pave({ id: 'n4_06', domaine: 'Calcul', libelle: '23 + 14 (barres visibles)', attendu: 37,
+    scene: () => grandLong(`23 + 14 = ${TROU}`) + additionBC(23, 14), aide: () => barresCubes(3, 7, true) + grand('20 + 10 = 30') + grand('3 + 4 = 7') }),
   pave({ id: 'n4_07', domaine: 'Sens des opérations', libelle: 'Léa avait ? cartes, elle en gagne 3, elle en a 9 : combien avant ?', attendu: 6,
     scene: () => illustration('carte', 2, 70), aide: () => deuxGroupes('carte', 6, 3, 24) + grand('9 − 3 = 6') }),
-  pave({ id: 'n4_08', domaine: 'Doubles', libelle: 'Double de 20', attendu: 40,
-    scene: () => grand(`20 + 20 = ${TROU}`), aide: () => barresCubes(4, 0, true) + grand('20 + 20 = 40') }),
+  pave({ id: 'n4_08', domaine: 'Doubles', libelle: 'Double de 20 (barres visibles)', attendu: 40,
+    scene: () => grandLong(`20 + 20 = ${TROU}`) + additionBC(20, 20), aide: () => barresCubes(4, 0, true) + grand('20 + 20 = 40') }),
   pave({ id: 'n4_09', domaine: 'Vérification', libelle: 'Un ami a trouvé 6 + 6 = 13 : bon résultat ?', attendu: 12,
     scene: () => calculAmi('6 + 6', 13), aide: () => deuxGroupes('point', 6, 6, 20) + grand('6 + 6 = 12') }),
-  pave({ id: 'n4_10', domaine: 'Calcul', libelle: '34 + 9 (ajouter 10, enlever 1)', attendu: 43,
-    scene: () => grand(`34 + 9 = ${TROU}`), aide: () => grand('34 + 10 = 44') + grand('44 − 1 = 43') }),
+  pave({ id: 'n4_10', domaine: 'Calcul (dizaines)', libelle: '34 + 10 (barres visibles)', attendu: 44,
+    scene: () => grandLong(`34 + 10 = ${TROU}`) + additionBC(34, 10), aide: () => barresCubes(4, 4, true) + grand('34 + 10 = 44') }),
   pave({ id: 'n4_11', domaine: 'Compléments à la dizaine', libelle: '63 + ? = 70', attendu: 7,
     scene: () => grand(`63 + ${TROU} = 70`), aide: () => bande(63, 70, 70) + grand('63 + 7 = 70') }),
   pave({ id: 'n4_12', domaine: 'Problème (écart)', libelle: 'Tom 12 billes, Léa 8 : combien Tom en a-t-il de plus ?', attendu: 4,
     scene: () => illustration('bille', 2, 70), aide: () => deuxRangees('bille', 12, 8) + grand('8 + 4 = 12') }),
   pave({ id: 'n4_13', domaine: 'Calcul', libelle: '40 − 3', attendu: 37,
     scene: () => grand(`40 − 3 = ${TROU}`), aide: () => bande(36, 40, 37) + grand('40 − 3 = 37') }),
-  pave({ id: 'n4_14', domaine: 'Calcul', libelle: '32 + 25', attendu: 57,
-    scene: () => grand(`32 + 25 = ${TROU}`), aide: () => barresCubes(5, 7, true) + grand('30 + 20 = 50') + grand('2 + 5 = 7') }),
+  pave({ id: 'n4_14', domaine: 'Calcul', libelle: '32 + 25 (barres visibles)', attendu: 57,
+    scene: () => grandLong(`32 + 25 = ${TROU}`) + additionBC(32, 25), aide: () => barresCubes(5, 7, true) + grand('30 + 20 = 50') + grand('2 + 5 = 7') }),
   pave({ id: 'n4_15', domaine: 'Moitiés', libelle: 'Moitié de 40', attendu: 20,
     scene: () => grand(`40 = ${TROU} + ${TROU}`), aide: () => barresCubes(2, 0) + '<span class="plus">+</span>' + barresCubes(2, 0) + grand('20 + 20 = 40') })
 ];
@@ -373,8 +378,8 @@ const N5 = [
     scene: () => grand(`7 + 8 = ${TROU}`), aide: () => grand('7 + 7 = 14') + grand('14 + 1 = 15') }),
   pave({ id: 'n5_04', domaine: 'Droite graduée', libelle: 'Droite 70–90 graduée de 1 en 1 : la flèche montre 83', attendu: 83,
     scene: () => droiteGraduee(70, 90, [70, 80, 90], 83), aide: () => droiteGraduee(70, 90, [70, 80, 83, 90], 83) + grand('80, 81, 82, 83') }),
-  pave({ id: 'n5_05', domaine: 'Calcul', libelle: '27 + 15 (avec passage de la dizaine)', attendu: 42,
-    scene: () => grand(`27 + 15 = ${TROU}`), aide: () => grand('20 + 10 = 30') + grand('7 + 5 = 12') + grand('30 + 12 = 42') }),
+  pave({ id: 'n5_05', domaine: 'Calcul (dizaines)', libelle: '50 + 30 (sans barres)', attendu: 80,
+    scene: () => grand(`50 + 30 = ${TROU}`), aide: () => barresCubes(8, 0, true) + grand('5 dizaines + 3 dizaines = 8 dizaines') }),
   pave({ id: 'n5_06', domaine: 'Sens des opérations', libelle: 'Boîte : on enlève 4 billes, il en reste 7 : combien au début ?', attendu: 11,
     scene: () => illustration('bille', 1, 110), aide: () => rangee('bille', 11, 26, 4) + grand('7 + 4 = 11') }),
   pave({ id: 'n5_07', domaine: 'Moitiés', libelle: 'Moitié de 16', attendu: 8,
@@ -383,8 +388,8 @@ const N5 = [
     scene: () => calculAmi('45 + 20', 47), aide: () => barresCubes(6, 5, true) + grand('45 + 20 = 65') }),
   pave({ id: 'n5_09', domaine: 'Doubles', libelle: 'Double de 50', attendu: 100,
     scene: () => grand(`50 + 50 = ${TROU}`), aide: () => barresCubes(5, 0) + '<span class="plus">+</span>' + barresCubes(5, 0) + grand('50 + 50 = 100') }),
-  pave({ id: 'n5_10', domaine: 'Calcul', libelle: '56 + 9 (ajouter 10, enlever 1)', attendu: 65,
-    scene: () => grand(`56 + 9 = ${TROU}`), aide: () => grand('56 + 10 = 66') + grand('66 − 1 = 65') }),
+  pave({ id: 'n5_10', domaine: 'Calcul (dizaines)', libelle: '56 + 10 (sans barres)', attendu: 66,
+    scene: () => grand(`56 + 10 = ${TROU}`), aide: () => barresCubes(6, 6, true) + grand('56 + 10 = 66') }),
   pave({ id: 'n5_11', domaine: 'Calcul', libelle: '60 − 4', attendu: 56,
     scene: () => grand(`60 − 4 = ${TROU}`), aide: () => bande(55, 60, 56) + grand('60 − 4 = 56') }),
   pave({ id: 'n5_12', domaine: 'Problème (deux étapes)', libelle: '8 billes, + 7, puis − 5', attendu: 10,
