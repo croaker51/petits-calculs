@@ -5,7 +5,7 @@ import { dessin, AVATARS, THEMES, LIBELLES } from '../themes.js';
 import { ITEMS, LIBELLES_CLASSEMENT, synthese } from '../test/items.js';
 import { PARCOURS } from '../seances/parcours.js';
 import { LIBELLES_SEANCE, syntheseSeance } from '../seances/ne_sait_pas.js';
-import { prochaineSeance, seancesTerminees } from '../seances/seance.js';
+import { prochaineSeance, seancesTerminees, getParcours } from '../seances/seance.js';
 import { APP_VERSION, SCHEMA_VERSION } from '../version.js';
 import { infoAudio, dire, arreter, deverrouillerAudio } from '../audio.js';
 import { CLASSES, DOMAINES, AXES, SOURCE, periodeApprochee } from '../suivi/referentiel.js';
@@ -102,7 +102,7 @@ function etatTest(profilId) {
 function etatSeances(p) {
   const parcours = PARCOURS[p.parcours];
   if (!parcours) return 'Parcours : à choisir (Modifier)';
-  const faites = new Set(seancesTerminees(p.id).map(x => x.seanceId)).size;
+  const faites = new Set(seancesTerminees(p.id, parcours.code).map(x => x.seanceId)).size;
   const pro = prochaineSeance(p);
   const ouverte = pro && pro.passation;
   return `Parcours ${parcours.code} · ${faites}/${parcours.seances.length} séances` +
@@ -127,6 +127,7 @@ function tableauDeBord() {
             <div class="cp-actions">
               ${e.pass ? `<button class="btn-texte" data-res="${e.pass.id}">Test</button>` : ''}
               ${p.parcours ? `<button class="btn-texte" data-seances="${p.id}">Séances</button>` : ''}
+              <button class="btn-texte" data-lecture="${p.id}">Lecture</button>
               <button class="btn-texte" data-suivi="${p.id}">Suivi</button>
               <button class="btn-texte" data-edit="${p.id}">Modifier</button>
             </div></div>`;
@@ -159,6 +160,7 @@ function tableauDeBord() {
   $$('[data-res]').forEach(b => b.onclick = () => resultats(b.dataset.res));
   $$('[data-suivi]').forEach(b => b.onclick = () => suivi(b.dataset.suivi));
   $$('[data-seances]').forEach(b => b.onclick = () => listeSeances(b.dataset.seances));
+  $$('[data-lecture]').forEach(b => b.onclick = () => listeSeances(b.dataset.lecture, 'L'));
   $('#exporter').onclick = exporter;
   $('#importer').onchange = importer;
   $('#changer-code').onclick = ecranCreationCode;
@@ -255,7 +257,7 @@ function barreTemps(ms, max) {
 // Items, libellés et synthèse d'une passation (test ou séance).
 function contexteResultats(pass) {
   if (pass.type === 'seance') {
-    const pc = PARCOURS[pass.parcours];
+    const pc = getParcours(pass.parcours);
     const se = pc && pc.seances.find(x => x.id === pass.seanceId);
     return { items: se ? se.items : [], libelles: LIBELLES_SEANCE, syn: syntheseSeance(pass.items),
       titre: `séance ${pass.seanceId}`, objectif: se ? se.objectif : '' };
@@ -280,6 +282,8 @@ function resultats(passId, retour = tableauDeBord) {
     if (r && r.essai2PeuSignificatif && cl === 'reussi-2e') notes.push('2e essai peu significatif (choix)');
     if (r && it.canonique && r.essais.some(e => e.juste && e.canonique === false)) notes.push('juste mais pas sous la forme dizaines + unités');
     if (r && r.neSaitPas) notes.push(`« je ne sais pas » après ${fmtTemps(r.neSaitPas.tempsMs)}`);
+    if (r && r.piegesAtteints) notes.push(...r.piegesAtteints);
+    if (r && r.nspAnnules) notes.push(`« ? » touché puis annulé (${r.nspAnnules})`);
     return `<tr class="cl-${cl}">
       <td><b>${esc(it.id)}</b> ${esc(it.libelle)}<br><small>${esc(it.domaine)}</small>${r && tempsPremierEssai(r) != null ? `<div class="temps-item"><small>Temps : ${fmtTemps(tempsPremierEssai(r))}</small>${barreTemps(tempsPremierEssai(r), tempsMax)}</div>` : ''}${notes.length ? `<br><small class="note">${notes.join(' · ')}</small>` : ''}</td>
       <td>${esc(String(it.attendu))}</td>
@@ -314,10 +318,10 @@ function resultats(passId, retour = tableauDeBord) {
 }
 
 // Liste des séances du parcours d'un enfant, avec leur état et l'accès aux résultats.
-function listeSeances(profilId) {
+function listeSeances(profilId, code) {
   const p = S.getProfil(profilId);
-  const pc = PARCOURS[p.parcours];
-  const passations = S.getPassations(profilId, 'seance');
+  const pc = getParcours(code || p.parcours);
+  const passations = S.getPassations(profilId, 'seance').filter(x => x.parcours === pc.code);
   const lignes = pc.seances.map(se => {
     const ps = passations.filter(x => x.seanceId === se.id);
     const fini = ps.filter(x => x.statut === 'termine').pop();
@@ -337,7 +341,7 @@ function listeSeances(profilId) {
       <section>${lignes}</section>
     </div>`, 'mode-parent');
   $('#retour').onclick = tableauDeBord;
-  $$('[data-res]').forEach(b => b.onclick = () => resultats(b.dataset.res, () => listeSeances(profilId)));
+  $$('[data-res]').forEach(b => b.onclick = () => resultats(b.dataset.res, () => listeSeances(profilId, pc.code)));
 }
 
 // ---------- Suivi du niveau : compétences CP → CE2, statut, essentielles ----------
@@ -346,7 +350,8 @@ function suivi(profilId) {
   const reg = S.getReglages();
   const periode = reg.periode || periodeApprochee();
   const essSeules = !!reg.essentiellesSeules;
-  const passations = S.getPassations(profilId).filter(x => (x.items || []).length);
+  // Suivi de MATHS : les séances de lecture (parcours L) n'y entrent pas.
+  const passations = S.getPassations(profilId).filter(x => (x.items || []).length && x.parcours !== 'L');
   const tout = bilan(passations);
   const lignes = essSeules ? tout.filter(l => l.essentielle) : tout;
   const ess = tout.filter(l => l.essentielle);

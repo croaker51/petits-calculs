@@ -164,6 +164,43 @@ function construireSaisie(it) {
     session.reinitialiser = () => { if (session.boutonChoisi) { session.boutonChoisi.disabled = true; session.boutonChoisi.classList.add('ecarte'); } };
   }
 
+  // Lecture (S1.5) : choix parmi des images, des mots ou des coupes (valeur = chaîne).
+  if (it.type === 'choixHtml') {
+    z.innerHTML = `<div class="choix-html${it.choix.length === 4 ? ' grille' : ''}">${it.choix.map(c => `<button class="btn-choix-html" data-v="${c.v}">${c.html}</button>`).join('')}</div>`;
+    $$('.btn-choix-html', z).forEach(b => b.onclick = () => {
+      if (b.disabled) return;
+      session.reponseCourante = b.dataset.v;
+      session.boutonChoisi = b;
+      valider();
+    });
+    session.reinitialiser = () => { if (session.boutonChoisi) { session.boutonChoisi.disabled = true; session.boutonChoisi.classList.add('ecarte'); } };
+  }
+
+  // Lecture (S1.5) : remettre des syllabes dans l'ordre (une syllabe en trop). Toucher une syllabe la pose
+  // dans la case suivante ; la flèche retire la dernière ; le bouton vert valide quand les cases sont pleines.
+  if (it.type === 'ordre') {
+    let posees = [];
+    z.innerHTML = `
+      <div class="ordre-cases" id="cases"></div>
+      <div class="ordre-tuiles">${it.tuiles.map((t, i) => `<button class="tuile" data-i="${i}">${it.tuileHtml(t)}</button>`).join('')}</div>
+      <div class="ordre-cmd">
+        <button class="touche touche-effacer" id="effacer" aria-label="Effacer">${ICONES.effacer}</button>
+        <button class="btn-grand btn-vert" id="valider" aria-label="Valider">${ICONES.valider}</button>
+      </div>`;
+    const maj = () => {
+      $('#cases').innerHTML = Array.from({ length: it.nb }, (_, k) =>
+        `<span class="case-syl${posees[k] !== undefined ? ' pleine' : ''}">${posees[k] !== undefined ? it.tuileHtml(it.tuiles[posees[k]]) : ''}</span>`).join('');
+      $$('.tuile', z).forEach(b => { b.disabled = posees.includes(+b.dataset.i); });
+      $('#valider').disabled = posees.length !== it.nb;
+      session.reponseCourante = posees.length === it.nb ? posees.map(i => it.tuiles[i]).join('-') : null;
+    };
+    $$('.tuile', z).forEach(b => b.onclick = () => { if (!b.disabled && posees.length < it.nb) { posees.push(+b.dataset.i); maj(); } });
+    $('#effacer').onclick = () => { posees.pop(); maj(); };
+    $('#valider').onclick = () => { if (session.reponseCourante !== null) valider(); };
+    session.reinitialiser = () => { posees = []; maj(); };
+    maj();
+  }
+
   if (it.type === 'barres') {
     let barres = 0, cubes = 0;
     z.innerHTML = `
@@ -317,6 +354,9 @@ function enregistrerItem() {
     classement: session.config.classer(session.essais, session.neSaitPas),
     ...(session.neSaitPas ? { neSaitPas: session.neSaitPas } : {}),
     ...(session.nspAnnules ? { nspAnnules: session.nspAnnules } : {}),
+    // Erreurs « typées » (S1.5) : valeur fausse prévue par l'item → cause notée (ex. « a additionné les deux nombres »).
+    ...(it.pieges && session.essais.some(e => !e.juste && it.pieges[e.reponse])
+      ? { piegesAtteints: session.essais.filter(e => !e.juste && it.pieges[e.reponse]).map(e => `${e.reponse} : ${it.pieges[e.reponse]}`) } : {}),
     ...(it.essai2PeuSignificatif ? { essai2PeuSignificatif: true } : {})
   });
   S.sauver();

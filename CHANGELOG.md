@@ -2,6 +2,22 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.3.7 — 2026-10-09
+- Séances S1.5 (parcours C), d'après les séances C2-C4 (sur « X, c'est Y plus combien ? » sans support, l'enfant additionne souvent les deux nombres) :
+  - C6 « Combien pour aller à ? » : dés, une main = 5, puis sans support ; compléments à 10 sans boîte ; nombre manquant en premier.
+  - C7 « Ajouter ou enlever ? » : paires + / − avec les mêmes nombres (8 − 3 / 8 + 3…), problèmes de retrait, d'ajout, de complément, transformation et état initial inconnus.
+  - Reprises C3R (= C3) et C6R (= C6) pour mesurer le progrès. Ordre : C5 → C6 → C3R → C7 → C6R.
+- Erreurs « typées » : si l'enfant tape la somme des deux nombres au lieu de ce qui manque (ou l'inverse), l'export et l'espace parent l'indiquent (« a additionné les deux nombres »).
+- Parcours N : N6 (écrire 70-99 sous la dictée) avancée juste après N3 (« 411 » pour 91, « 902 » pour 92).
+- Ligne numérique des séances : tolérance ramenée de ±10 à ±5 (34 était accepté pour 25). Le test de départ garde ±10.
+- Espace parent : « ? » touché puis annulé affiché sous l'exercice.
+- **Nouveau : le jeu des mots (lecture)**, commun aux deux enfants, au choix depuis l'accueil (bouton livre), indépendant du test de maths.
+  - L1 lire un mot → image ; L2 où couper (syllabes) ; L3 mots inventés entendus → écrits ; L4 remettre les syllabes dans l'ordre (une en trop) ; L5 lire une phrase → image.
+  - 100 % déchiffrable avec les sons vus (ou, a, e, i, o, y, é, l, m, f) + mots connus (dans, et, est, un, une, Kali) ; lettres muettes grisées ; test automatique.
+  - Nouveaux dessins : lama, loup, fée, moule, pelote, malle, momie.
+  - Espace parent : bouton « Lecture » (séances et résultats) ; la lecture n'entre pas dans le Suivi de maths.
+- Voix : 135 nouvelles phrases en voix clonée. Maths : contrôle par transcription et contrôle strict des nombres, tout conforme. Lecture : 5 phrases douteuses à la transcription (l2_05_e, l2_10_e, l3_04_e, l3_07_e, l4_02_e) en voix de secours en attendant l'écoute de Simon.
+
 ## 0.3.6 — 2026-10-09
 - « Je ne sais pas » protégé contre les appuis par erreur (signalé par Simon) : 1er appui → la voix demande « Tu veux que je t'explique ? » et le bouton « ? » devient orange et pulse ; 2e appui → aide et explication comme avant. Si l'enfant répond entre-temps, la demande est annulée. Les appuis annulés sont notés dans l'export (`nspAnnules`).
 - Nouvelle phrase `ne_sait_pas_confirmer` en voix de secours en attendant la voix clonée.

@@ -45,6 +45,11 @@ function accueilEnfant(p) {
   if (enTest) { suite = testOuvert ? 'accueil_reprise' : 'accueil_test'; jouer = () => lancerTest(p, retour); }
   else if (seance) { suite = seance.passation ? 'accueil_reprise' : 'accueil_seance'; jouer = () => lancerSeance(p, retour); }
   else suite = p.parcours ? 'accueil_tout_fini' : 'accueil_fini';
+  // Le jeu des mots (lecture) : au choix, indépendant du test de maths (décision de Simon, 09/10).
+  const lecture = prochaineSeance(p, 'L');
+  const lire = lecture ? () => lancerSeance(p, retour, 'L') : null;
+  if (lire && jouer) suite = 'accueil_choix';
+  else if (lire && !jouer) suite = 'accueil_lecture';
   function retour() { accueilEnfant(S.getProfil(p.id)); }
 
   const decor = (p.themes || []).filter(t => t !== p.avatar).slice(0, 6)
@@ -56,12 +61,17 @@ function accueilEnfant(p) {
       <div class="avatar-geant">${dessin(p.avatar, 170)}</div>
       <div class="prenom-grand">${esc(p.prenom)}</div>
       <button class="btn-rond btn-oreille" id="ecouter" aria-label="Réécouter">${ICONES.oreille}</button>
-      ${jouer ? `<button class="btn-grand btn-vert" id="jouer" aria-label="Jouer">${ICONES.valider}</button>` : ''}
+      <div class="choix-jeux">
+        ${jouer ? `<button class="btn-grand btn-vert" id="jouer" aria-label="Jouer avec les nombres">${ICONES.valider}</button>` : ''}
+        ${lire ? `<button class="btn-grand btn-livre" id="lire" aria-label="Jouer avec les mots">${ICONES.livre}</button>` : ''}
+      </div>
     </div>`, 'fond-' + p.avatar);
   $('#retour').onclick = choixEnfant;
   $('#ecouter').onclick = () => reecouter();
   const j = $('#jouer');
   if (j) j.onclick = () => { arreter(); jouer(); };
+  const l = $('#lire');
+  if (l) l.onclick = () => { arreter(); lire(); };
   dire(['bonjour_' + p.avatar, suite]);
 }
 

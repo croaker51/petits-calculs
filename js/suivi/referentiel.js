@@ -142,7 +142,15 @@ export const ITEM_COMPETENCE = {
   // doubles = CP-C2 ★.
   n8_01: 'CP-C1', n8_02: 'CP-C1', n8_03: 'CP-C1', n8_04: 'CP-C1', n8_05: 'CP-C1', n8_06: 'CP-C1',
   n8_07: 'CP-C1', n8_08: 'CP-C1', n8_09: 'CP-C2', n8_10: 'CP-C1', n8_11: 'CP-C2', n8_12: 'CP-C1',
-  n8_13: 'CP-C1', n8_14: 'CP-C1', n8_15: 'CP-C1'
+  n8_13: 'CP-C1', n8_14: 'CP-C1', n8_15: 'CP-C1',
+  // Séances S1.5 (parcours C, séances 6 et 7). Mêmes rattachements que les items équivalents :
+  // décompositions ≤ 10 = CP-C1 (comme c3_04, c3_09) ; compléments à 10 = CP-C6 (comme c3_15) ;
+  // ± 1 ou 2 = CP-C3 (comme c3_08) ; 10 − 3, 10 − 4 = CP-C11 (comme n4_13) ; 10 + 3 = CP-C7 ;
+  // problèmes = CP-P1 (comme c3_07, c3_11) ; transformation / état initial inconnus = CP-O1 (comme c4_14, n4_07).
+  c6_01: 'CP-C1', c6_02: 'CP-C1', c6_03: 'CP-C1', c6_04: 'CP-C1', c6_05: 'CP-C1', c6_06: 'CP-C1', c6_07: 'CP-C1',
+  c6_08: 'CP-C1', c6_09: 'CP-C1', c6_10: 'CP-C6', c6_11: 'CP-C6', c6_12: 'CP-C6', c6_13: 'CP-C1', c6_14: 'CP-C1', c6_15: 'CP-C1',
+  c7_01: 'CP-C1', c7_02: 'CP-C1', c7_03: 'CP-C3', c7_04: 'CP-C3', c7_05: 'CP-C11', c7_06: 'CP-C7', c7_07: 'CP-P1',
+  c7_08: 'CP-P1', c7_09: 'CP-P1', c7_10: 'CP-P1', c7_11: 'CP-P1', c7_12: 'CP-O1', c7_13: 'CP-O1', c7_14: 'CP-C11', c7_15: 'CP-C1'
 };
 
 // Compétences effectivement travaillées par au moins un item de l'appli.

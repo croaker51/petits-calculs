@@ -18,10 +18,13 @@ import {
   suiteATrou, dictee, calculAmi, ligneAide, illustration, de, deuxDes, droiteGraduee, main, mains
 } from '../rendu.js';
 
-export const VERSION_SEANCES = 'S1.4'; // S1.0 : séances 1-3 ; S1.1 : + séances 4-5 ; S1.2 : additions de dizaines du parcours N reprises avec les barres ; S1.3 : parcours C, terme manquant en 1re position, presque-doubles, signe moins ; S1.4 : parcours N, séances N6-N8 (écriture 70-99 et inversions, dizaines sans barres, suites, calculer sans compter)
+export const VERSION_SEANCES = 'S1.5'; // S1.5 : parcours C, séances C6-C7 + reprises C3R, C6R ; N6 avancée après N3 ; ligne ±5 ; S1.0 : séances 1-3 ; S1.1 : + séances 4-5 ; S1.2 : additions de dizaines du parcours N reprises avec les barres ; S1.3 : parcours C, terme manquant en 1re position, presque-doubles, signe moins ; S1.4 : parcours N, séances N6-N8 (écriture 70-99 et inversions, dizaines sans barres, suites, calculer sans compter)
 
 // ---------- Fabriques (la vérification est toujours une égalité stricte, ou une tolérance pour la ligne) ----------
 const pave = o => ({ type: 'pave', verifier: r => r === o.attendu, ...o });
+// pieges (S1.5) : { valeur fausse : cause } — si l'enfant tape cette valeur, l'export le note
+// (ex. 9 = 7 + ? → 16 : « a additionné »). L'exercice révèle la cause de l'erreur, sans interprétation.
+const ADD = 'a additionné les deux nombres', SOUS = 'a soustrait au lieu d\'ajouter';
 
 const choix = o => ({
   type: 'choix', verifier: r => r === o.attendu,
@@ -43,7 +46,8 @@ const construire = (id, n, libelle) => {
   };
 };
 
-const ligne = (id, cible, tolerance = 10) => ({
+// Tolérance ±5 depuis S1.5 (±10 acceptait 34 pour 25 — décision de Simon, 09/10). Le test T1 garde sa propre ligne (±10 autour de 50).
+const ligne = (id, cible, tolerance = 5) => ({
   id, domaine: 'Ligne numérique', libelle: `Placer ${cible} sur une ligne 0–100 (tolérance ±${tolerance})`,
   type: 'ligne', bornes: [0, 100], cible, tolerance, attendu: cible, aideComplete: true,
   verifier: r => typeof r === 'number' && Math.abs(r - cible) <= tolerance,
@@ -505,6 +509,85 @@ const N8 = [
     () => `<div class="groupes">${main(5)}<span class="plus">+</span>${main(5)}${main(0, 1)}</div>` + grand('5 + 5 = 10') + grand('10 + 1 = 11'))
 ];
 
+// =====================================================================================
+// S1.5 — PARCOURS C, séances 6 et 7 (d'après les séances C2-C4 : sur « X, c'est Y plus combien ? »
+// sans support, l'enfant additionne souvent les deux nombres : 9 = 7 + ? → 15/16, 7 = 3 + ? → 10)
+// =====================================================================================
+const C6 = [
+  // Rappel avec les dés (acquis en C4)
+  pave({ id: 'c6_01', domaine: 'Compléments à 5', libelle: 'Dés : 3 + ? = 5', attendu: 2,
+    scene: () => deuxDes(3, null), aide: () => deuxDes(3, 2) + grand('3 + 2 = 5') }),
+  pave({ id: 'c6_02', domaine: 'Compléments à 5', libelle: 'Dés : 1 + ? = 5', attendu: 4,
+    scene: () => deuxDes(1, null), aide: () => deuxDes(1, 4) + grand('1 + 4 = 5') }),
+  pave({ id: 'c6_03', domaine: 'Décomposition', libelle: 'Dés : ? + 3 = 4 (dé caché en premier)', attendu: 1,
+    scene: () => deuxDes(null, 3), aide: () => deuxDes(1, 3) + grand('1 + 3 = 4') }),
+  // Une main = 5 (le nombre DONNÉ est dessiné, jamais la réponse : B13)
+  pave({ id: 'c6_04', domaine: 'Décomposition', libelle: '7 = 5 + ? (une main de 5 visible)', attendu: 2, pieges: { 12: ADD },
+    scene: () => grand(`7 = 5 + ${TROU}`) + main(5), aide: () => mains(7, 2) + grand('7 = 5 + 2') }),
+  pave({ id: 'c6_05', domaine: 'Décomposition', libelle: '8 = 5 + ? (une main de 5 visible)', attendu: 3, pieges: { 13: ADD },
+    scene: () => grand(`8 = 5 + ${TROU}`) + main(5), aide: () => mains(8, 3) + grand('8 = 5 + 3') }),
+  pave({ id: 'c6_06', domaine: 'Décomposition', libelle: '9 = 5 + ? (une main de 5 visible)', attendu: 4, pieges: { 14: ADD },
+    scene: () => grand(`9 = 5 + ${TROU}`) + main(5), aide: () => mains(9, 4) + grand('9 = 5 + 4') }),
+  // Sans support : ses erreurs réelles
+  pave({ id: 'c6_07', domaine: 'Décomposition', libelle: '9 = 7 + ? sans support (erreur c3_04 : 15)', attendu: 2, pieges: { 16: ADD },
+    scene: () => grand(`9 = 7 + ${TROU}`), aide: () => mains(9, 2) + grand('9 = 7 + 2') }),
+  pave({ id: 'c6_08', domaine: 'Décomposition', libelle: '7 = 3 + ? sans support (erreur c3_09 : 10)', attendu: 4, pieges: { 10: ADD },
+    scene: () => grand(`7 = 3 + ${TROU}`), aide: () => mains(7, 4) + grand('7 = 3 + 4') }),
+  pave({ id: 'c6_09', domaine: 'Décomposition', libelle: '9 = 6 + ? sans support', attendu: 3, pieges: { 15: ADD },
+    scene: () => grand(`9 = 6 + ${TROU}`), aide: () => mains(9, 3) + grand('9 = 6 + 3') }),
+  // Compléments à 10 sans boîte (la boîte n'est que dans l'aide)
+  pave({ id: 'c6_10', domaine: 'Compléments à 10', libelle: '10 = 4 + ? sans boîte (erreur c2_05 : 5)', attendu: 6, pieges: { 14: ADD },
+    scene: () => grand(`10 = 4 + ${TROU}`), aide: () => boiteDe10(4, 6) + grand('10 = 4 + 6') }),
+  pave({ id: 'c6_11', domaine: 'Compléments à 10', libelle: '10 = 7 + ? sans boîte', attendu: 3, pieges: { 17: ADD },
+    scene: () => grand(`10 = 7 + ${TROU}`), aide: () => boiteDe10(7, 3) + grand('10 = 7 + 3') }),
+  pave({ id: 'c6_12', domaine: 'Compléments à 10', libelle: '10 = 2 + ? sans boîte', attendu: 8, pieges: { 12: ADD },
+    scene: () => grand(`10 = 2 + ${TROU}`), aide: () => boiteDe10(2, 8) + grand('10 = 2 + 8') }),
+  // Nombre manquant en 1re position (erreur c3_05 : « ? + 2 = 6 » → 26 puis 3)
+  pave({ id: 'c6_13', domaine: 'Décomposition', libelle: '? + 2 = 7 sans support (terme manquant en premier)', attendu: 5, pieges: { 9: ADD },
+    scene: () => grand(`${TROU} + 2 = 7`), aide: () => mains(7, 2) + grand('5 + 2 = 7') }),
+  pave({ id: 'c6_14', domaine: 'Décomposition', libelle: '? + 3 = 7 sans support (terme manquant en premier)', attendu: 4, pieges: { 10: ADD },
+    scene: () => grand(`${TROU} + 3 = 7`), aide: () => mains(7, 3) + grand('4 + 3 = 7') }),
+  pave({ id: 'c6_15', domaine: 'Décomposition', libelle: '? + 4 = 10 sans support (terme manquant en premier)', attendu: 6, pieges: { 14: ADD },
+    scene: () => grand(`${TROU} + 4 = 10`), aide: () => boiteDe10(6, 4) + grand('6 + 4 = 10') })
+];
+
+const moins = (a, b) => grand(`${a} <span class="signe-fort">−</span> ${b} = ${TROU}`);
+const plus = (a, b) => grand(`${a} <span class="signe-fort">+</span> ${b} = ${TROU}`);
+const C7 = [
+  // Paires + / − avec les mêmes nombres : il faut lire le signe (erreur c2_10 : 8 − 3 → 11)
+  pave({ id: 'c7_01', domaine: 'Calcul', libelle: '8 − 3 (paire avec 8 + 3)', attendu: 5, pieges: { 11: ADD },
+    scene: () => moins(8, 3), aide: () => rangee('point', 8, 26, 3) + grand('8 − 3 = 5') }),
+  pave({ id: 'c7_02', domaine: 'Calcul', libelle: '8 + 3 (paire avec 8 − 3)', attendu: 11, pieges: { 5: SOUS },
+    scene: () => plus(8, 3), aide: () => deuxGroupes('point', 8, 3, 24) + grand('8 + 3 = 11') }),
+  pave({ id: 'c7_03', domaine: 'Calcul', libelle: '6 + 2 (paire avec 6 − 2)', attendu: 8, pieges: { 4: SOUS },
+    scene: () => plus(6, 2), aide: () => deuxGroupes('point', 6, 2, 26) + grand('6 + 2 = 8') }),
+  pave({ id: 'c7_04', domaine: 'Calcul', libelle: '6 − 2 (paire avec 6 + 2)', attendu: 4, pieges: { 8: ADD },
+    scene: () => moins(6, 2), aide: () => rangee('point', 6, 26, 2) + grand('6 − 2 = 4') }),
+  pave({ id: 'c7_05', domaine: 'Calcul', libelle: '10 − 3 (paire avec 10 + 3)', attendu: 7, pieges: { 13: ADD },
+    scene: () => moins(10, 3), aide: () => rangee('point', 10, 24, 3) + grand('10 − 3 = 7') }),
+  pave({ id: 'c7_06', domaine: 'Calcul', libelle: '10 + 3 (paire avec 10 − 3)', attendu: 13, pieges: { 7: SOUS },
+    scene: () => plus(10, 3), aide: () => barresCubes(1, 3, true) + grand('10 + 3 = 13') }),
+  // Problèmes : enlever, ajouter, compléter
+  pave({ id: 'c7_07', domaine: 'Problème (retrait)', libelle: '10 cartes, Tom en prend 6', attendu: 4, pieges: { 16: ADD },
+    scene: () => illustration('carte', 1, 110), aide: () => rangee('carte', 10, 26, 6) + grand('10 − 6 = 4') }),
+  pave({ id: 'c7_08', domaine: 'Problème (retrait)', libelle: '9 billes, on en perd 2', attendu: 7, pieges: { 11: ADD },
+    scene: () => illustration('bille', 1, 110), aide: () => rangee('bille', 9, 28, 2) + grand('9 − 2 = 7') }),
+  pave({ id: 'c7_09', domaine: 'Problème (ajout)', libelle: '6 étoiles, elle en gagne 3', attendu: 9, pieges: { 3: SOUS },
+    scene: () => illustration('etoile', 1, 110), aide: () => deuxGroupes('etoile', 6, 3, 26) + grand('6 + 3 = 9') }),
+  pave({ id: 'c7_10', domaine: 'Problème (complément)', libelle: 'On veut 8 billes, on en a 5', attendu: 3, pieges: { 13: ADD },
+    scene: () => illustration('bille', 1, 110), aide: () => deuxGroupes('bille', 5, 3, 28) + grand('5 + 3 = 8') }),
+  pave({ id: 'c7_11', domaine: 'Problème (complément)', libelle: 'Il faut 10 points, Tom en a 6', attendu: 4, pieges: { 16: ADD },
+    scene: () => illustration('etoile', 1, 110), aide: () => boiteDe10(6, 4) + grand('6 + 4 = 10') }),
+  pave({ id: 'c7_12', domaine: 'Sens des opérations', libelle: 'Léa avait 7 cartes, en donne, il en reste 5 : combien données ?', attendu: 2, pieges: { 12: ADD },
+    scene: () => illustration('carte', 2, 70), aide: () => rangee('carte', 7, 28, 2) + grand('7 = 5 + 2') }),
+  pave({ id: 'c7_13', domaine: 'Sens des opérations', libelle: 'Tom reçoit 2 billes et en a 9 : combien au début ?', attendu: 7, pieges: { 11: ADD },
+    scene: () => illustration('bille', 1, 110), aide: () => deuxGroupes('bille', 7, 2, 26) + grand('7 + 2 = 9') }),
+  pave({ id: 'c7_14', domaine: 'Calcul', libelle: '10 − 4', attendu: 6, pieges: { 14: ADD },
+    scene: () => moins(10, 4), aide: () => rangee('point', 10, 24, 4) + grand('10 − 4 = 6') }),
+  pave({ id: 'c7_15', domaine: 'Décomposition', libelle: '8 = 6 + ? sans support', attendu: 2, pieges: { 14: ADD },
+    scene: () => grand(`8 = 6 + ${TROU}`), aide: () => mains(8, 2) + grand('8 = 6 + 2') })
+];
+
 export const PARCOURS = {
   C: {
     code: 'C', titre: 'Décomposer et compléter',
@@ -513,7 +596,12 @@ export const PARCOURS = {
       { id: 'C2', objectif: 'Décomposer 8 et 9, compléments à 10 avec la boîte ; chiffre des dizaines ; écrire 91', items: C2 },
       { id: 'C3', objectif: 'Décompositions sans support (aide visuelle seulement après 2 essais) ; dictée 95', items: C3 },
       { id: 'C4', objectif: 'Compléments à 5 et doubles avec les dés ; droite graduée 0-10 ; 8 = 5 + 3 avec les dés', items: C4 },
-      { id: 'C5', objectif: 'Doubles et compléments à 5 sans dé ; 7 et 9 = 5 + ? ; droite 0-20 ; moitié de 6 ; 12 + 13', items: C5 }
+      { id: 'C5', objectif: 'Doubles et compléments à 5 sans dé ; 7 et 9 = 5 + ? ; droite 0-20 ; moitié de 6 ; 12 + 13', items: C5 },
+      { id: 'C6', objectif: '« X, c\'est Y plus combien ? » : dés, une main = 5, puis sans support ; compléments à 10 ; nombre manquant en premier', items: C6 },
+      // Reprise : mêmes items que C3 (mesure du progrès ; les observations comptent pour le Suivi).
+      { id: 'C3R', reprise: 'C3', objectif: 'Reprise de C3 (décompositions sans support) pour mesurer le progrès', items: C3 },
+      { id: 'C7', objectif: 'Ajouter ou enlever ? Paires + / − ; problèmes de retrait, d\'ajout, de complément ; transformation et état initial inconnus', items: C7 },
+      { id: 'C6R', reprise: 'C6', objectif: 'Reprise de C6 pour mesurer le progrès', items: C6 }
     ]
   },
   N: {
@@ -522,14 +610,14 @@ export const PARCOURS = {
       { id: 'N1', objectif: 'Suite et écriture 85-97 ; avant / après ; « de plus / de moins que » ; vérifier un calcul', items: N1 },
       { id: 'N2', objectif: 'Jusqu\'à 100 ; forme non canonique ; calcul en dizaines ; problème à deux étapes', items: N2 },
       { id: 'N3', objectif: 'Comparaison inversée et écart ; décomposition ; à rebours ; deux étapes', items: N3 },
+      { id: 'N6', objectif: 'Écrire les nombres 70-99 sous la dictée ; dizaines + unités sans inverser les chiffres (14 / 41, 92 / 902)', items: N6 },
       { id: 'N4', objectif: 'Doubles et moitiés ; droite graduée 40-60 ; additions sans retenue ; ajouter 9 ; état initial inconnu', items: N4 },
       { id: 'N5', objectif: 'Presque-doubles ; addition avec retenue ; droite 70-90 ; valeur du chiffre ; problème multiplicatif', items: N5 },
-      { id: 'N6', objectif: 'Écrire les nombres 70-99 sous la dictée ; dizaines + unités sans inverser les chiffres (14 / 41, 92 / 902)', items: N6 },
       { id: 'N7', objectif: 'Dizaines sans barres ; dizaines + unités ; suites de 10 en 10 et de 5 en 5 ; re-test « de plus que »', items: N7 },
       { id: 'N8', objectif: 'Calculer sans compter un par un : compléments à 5, passage par 5 (une main = 5), doubles + 1', items: N8 }
     ]
   }
 };
 
-// Tous les items, à plat (tests, écran parent).
-export const TOUS_LES_ITEMS = Object.values(PARCOURS).flatMap(p => p.seances.flatMap(s => s.items));
+// Tous les items, à plat (tests, écran parent). Les reprises (même items) ne sont comptées qu'une fois.
+export const TOUS_LES_ITEMS = Object.values(PARCOURS).flatMap(p => p.seances.filter(s => !s.reprise).flatMap(s => s.items));
