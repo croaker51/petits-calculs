@@ -2,6 +2,9 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.3.8 — 2026-10-09
+- Voix : les 5 phrases de lecture mises en attente (l2_05_e, l2_10_e, l3_04_e, l3_07_e, l4_02_e) ont été écoutées et validées par Simon : voix clonée rétablie. Toutes les phrases (581) sont en voix clonée.
+
 ## 0.3.7 — 2026-10-09
 - Séances S1.5 (parcours C), d'après les séances C2-C4 (sur « X, c'est Y plus combien ? » sans support, l'enfant additionne souvent les deux nombres) :
   - C6 « Combien pour aller à ? » : dés, une main = 5, puis sans support ; compléments à 10 sans boîte ; nombre manquant en premier.
