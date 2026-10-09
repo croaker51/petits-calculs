@@ -268,6 +268,8 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .zone-nsp { display: flex; justify-content: center; margin-top: 6px; }
 .zone-nsp[hidden] { display: none; }
 .btn-ne-sais-pas { color: var(--orange); }
+.btn-ne-sais-pas.a-confirmer { background: var(--orange); color: #fff; transform: scale(1.15); animation: nsp-pulse 1.2s ease-in-out infinite; }
+@keyframes nsp-pulse { 50% { transform: scale(1.25); } }
 .choix-parcours { display: flex; flex-direction: column; gap: 8px; }
 .case-choix.large { width: 100%; text-align: left; padding: 10px 14px; display: block; }
 .case-choix.large small { display: block; }

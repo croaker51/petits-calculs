@@ -64,6 +64,7 @@ export const PHRASES = {
   accueil_seance: "Ton jeu du jour t'attend. Touche le bouton vert pour commencer.",
   seance_intro: "C'est parti pour le jeu du jour. Écoute bien chaque question, et prends ton temps. Si tu ne comprends pas, touche le point d'interrogation : je t'explique.",
   ne_sait_pas: "D'accord. Tu as bien fait de le dire. Regarde, je t'explique.",
+  ne_sait_pas_confirmer: "Tu veux que je t'explique ? Touche encore le point d'interrogation. Sinon, continue à chercher.",
   accueil_tout_fini: "Tu as fini tous les jeux. Bravo ! Les prochains jeux arrivent bientôt.",
   seance_fin: "Bravo, le jeu du jour est fini ! Tu as bien réfléchi. Tu peux aller le dire à un grand.",
 

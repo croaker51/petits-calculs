@@ -2,6 +2,10 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.3.6 — 2026-10-09
+- « Je ne sais pas » protégé contre les appuis par erreur (signalé par Simon) : 1er appui → la voix demande « Tu veux que je t'explique ? » et le bouton « ? » devient orange et pulse ; 2e appui → aide et explication comme avant. Si l'enfant répond entre-temps, la demande est annulée. Les appuis annulés sont notés dans l'export (`nspAnnules`).
+- Nouvelle phrase `ne_sait_pas_confirmer` en voix de secours en attendant la voix clonée.
+
 ## 0.3.5 — 2026-10-04
 - Séances S1.4 (parcours N), d'après le cahier d'école (10 + 4 écrit 41, 92 écrit « 902 », 8 + 2 → 9) : trois séances ajoutées après N5, items existants inchangés.
   - N6 : écrire sous la dictée les nombres 70-99 ; « 3 dizaines 5 unités » ; 10 + 4, 4 + 20 (pièges d'inversion 14 / 41, 35 / 53, 24 / 42).

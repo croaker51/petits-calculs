@@ -8,6 +8,9 @@
 //  - un appui = aide visuelle + explication orale tout de suite (comme après 2 erreurs),
 //    sans reproche (règle B5), puis item suivant ;
 //  - classement distinct de « non acquis » : l'enfant a su repérer qu'il ne savait pas.
+//  - CONFIRMATION (v0.3.6, demande de Simon : « ? » touché par erreur) : 1er appui = la voix demande
+//    « Tu veux que je t'explique ? » et le bouton change d'aspect ; 2e appui = « je ne sais pas » enregistré.
+//    Toute réponse saisie entre-temps annule la demande. Les appuis annulés sont comptés (nspAnnules).
 
 // Point d'interrogation dans une bulle : compréhensible sans savoir lire.
 export const ICONE_NE_SAIS_PAS = `<svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true">
@@ -53,5 +56,6 @@ export function syntheseSeance(resultats) {
 // Phrases audio à ajouter à phrases.js (nombres en lettres, aucune lecture exigée).
 export const PHRASES_NE_SAIS_PAS = {
   seance_intro: "C'est parti pour le jeu du jour. Écoute bien chaque question, et prends ton temps. Si tu ne comprends pas, touche le point d'interrogation : je t'explique.",
-  ne_sait_pas: "D'accord. Tu as bien fait de le dire. Regarde, je t'explique."
+  ne_sait_pas: "D'accord. Tu as bien fait de le dire. Regarde, je t'explique.",
+  ne_sait_pas_confirmer: "Tu veux que je t'explique ? Touche encore le point d'interrogation. Sinon, continue à chercher."
 };

@@ -102,6 +102,8 @@ function afficherItem(index) {
   if (session.config.neSaisPas) $('#neSaisPas').onclick = neSaisPas;
   session.tFinConsigne = null;
   session.consigneFinie = false;
+  session.nspAConfirmer = false;
+  session.nspAnnules = 0;
   session.tDebut = performance.now();
   dire(it.consigne || it.id + '_c').then(() => {
     if (session && session.item === it) {
@@ -117,6 +119,14 @@ function majBoutonNeSaisPas() {
   const z = $('#zone-nsp');
   if (!z || !session) return;
   z.hidden = !boutonDisponible({ consigneFinie: session.consigneFinie, essais: session.essais, termine: !!session.itemTermine });
+}
+
+// L'enfant a répondu après un 1er appui sur « ? » : l'appui était une erreur, on l'annule et on le compte.
+function annulerConfirmationNsp() {
+  if (!session || !session.nspAConfirmer) return;
+  session.nspAConfirmer = false;
+  session.nspAnnules = (session.nspAnnules || 0) + 1;
+  const b = $('#neSaisPas'); if (b) b.classList.remove('a-confirmer');
 }
 
 // ---------- Zones de saisie selon le type d'item ----------
@@ -207,6 +217,7 @@ let verrou = false;
 async function valider() {
   if (verrou) return;
   verrou = true;
+  annulerConfirmationNsp();
   const it = session.item;
   const maintenant = performance.now();
   const reponse = session.reponseCourante;
@@ -258,6 +269,14 @@ async function valider() {
 function neSaisPas() {
   if (!session || verrou || session.itemTermine) return;
   arreter();
+  // Confirmation (v0.3.6) : le 1er appui demande seulement « Tu veux que je t'explique ? ».
+  if (!session.nspAConfirmer) {
+    session.nspAConfirmer = true;
+    const b = $('#neSaisPas'); if (b) b.classList.add('a-confirmer');
+    dire(['ne_sait_pas_confirmer']);
+    return;
+  }
+  session.nspAConfirmer = false;
   const debut = session.tFinConsigne || session.tDebut;
   session.neSaitPas = { apresEssais: session.essais.length, tempsMs: Math.round(performance.now() - debut) };
   montrerAide(null, 'ne_sait_pas');
@@ -297,6 +316,7 @@ function enregistrerItem() {
     essais: session.essais,
     classement: session.config.classer(session.essais, session.neSaitPas),
     ...(session.neSaitPas ? { neSaitPas: session.neSaitPas } : {}),
+    ...(session.nspAnnules ? { nspAnnules: session.nspAnnules } : {}),
     ...(it.essai2PeuSignificatif ? { essai2PeuSignificatif: true } : {})
   });
   S.sauver();
