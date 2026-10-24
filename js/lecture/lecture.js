@@ -13,28 +13,110 @@
 // Notation des mots : syllabes séparées par « - », lettres muettes entre crochets. Ex. « mou-l[e] », « lou[p] ».
 import { dessin } from '../themes.js';
 
-export const SONS_VUS = ['ou', 'a', 'e', 'i', 'o', 'y', 'é', 'l', 'm', 'f'];
-// Mots lus « globalement » (mots outils de la classe, et le nom du koala du manuel, qui contient un k non vu).
-export const MOTS_CONNUS = ['dans', 'et', 'est', 'un', 'une', 'kali'];
+// ---------- Progression du manuel de la classe (Calimot, « Décoder et encoder ») ----------
+// Source : programmation annuelle du manuel (p. 4) et pages 18 à 25, photographiées par Simon le 09/10.
+// Seul l'ORDRE des sons et des mots outils est repris (aucun texte ni dessin du manuel).
+// sons : graphèmes déchiffrables à partir de cette page ; outils : mots outils lus globalement.
+// Mots outils avant la p. 18 : non connus page par page → rattachés à la p. 20, où la classe les « relit »
+// (choix prudent : jamais plus tôt que ce qui est attesté).
+export const PROGRESSION_CALIMOT = [
+  { page: 12, sons: ['a'] }, { page: 13, sons: ['o'] },
+  { page: 14, sons: ['é'] }, { page: 15, sons: ['i', 'y'] },
+  { page: 16, sons: ['u'] }, { page: 17, sons: ['e'] },
+  { page: 18, sons: ['l'], outils: ['elle', 'là', 'sur'] },
+  { page: 19, sons: ['r'], outils: ['est', 'et'] },
+  { page: 20, outils: ['à', 'un', 'une'] },                       // révision : « je relis les mots outils »
+  { page: 21, sons: ['f'], outils: ['dans'] },
+  { page: 22, sons: ['m'] },
+  { page: 23, sons: ['ou'], outils: ['avec', "c'est"] },
+  { page: 24, outils: ['les', 'des'] },                          // syllabes consonne-voyelle-consonne
+  // Unité 2
+  { page: 26, sons: ['v'] }, { page: 27, sons: ['ch'] },
+  { page: 28, sons: ['j'] }, { page: 29, sons: ['s', 'ss'] },
+  { page: 30, sons: ['n'] }, { page: 31, sons: ['p'] },
+  { page: 32, sons: ['t'] },
+  { page: 34, sons: ['b'] }, { page: 35, sons: ['on', 'om'] },
+  { page: 36, sons: ['c', 'k'] }, { page: 37, sons: ['q', 'qu'] },
+  { page: 38, sons: ['au', 'eau'] },
+  // Unité 3 (début ; la suite du sommaire n'a pas été transmise)
+  { page: 40, sons: ['z'] }, { page: 41, sons: ['d'] },
+  { page: 42, sons: ['an', 'am'] }, { page: 43, sons: ['en', 'em'] }
+  // p. 44-45 : fl / bl, fr / br… = enchaînements de consonnes déjà vues (rien de nouveau à déchiffrer).
+];
+export const PAGE_MIN = 11, PAGE_MAX = 45;
+export const PAGE_PAR_DEFAUT = 25; // classe en fin d'unité 1 au 09/10 (Simon)
+// Mots toujours acceptés : le nom du koala du manuel (k non vu au début).
+const TOUJOURS_CONNUS = ['kali'];
+
+// Page réglée dans l'espace parent (réglage commun aux enfants : même classe).
+let pageCourante = PAGE_PAR_DEFAUT;
+export function reglerPage(page) {
+  const n = Math.round(Number(page));
+  pageCourante = Number.isFinite(n) ? Math.min(PAGE_MAX, Math.max(PAGE_MIN, n)) : PAGE_PAR_DEFAUT;
+  return pageCourante;
+}
+export const pageReglee = () => pageCourante;
+
+// Sons et mots outils vus jusqu'à la page incluse.
+export function acquisALaPage(page = pageCourante) {
+  const vus = PROGRESSION_CALIMOT.filter(e => e.page <= page);
+  return {
+    sons: vus.flatMap(e => e.sons || []),
+    outils: [...TOUJOURS_CONNUS, ...vus.flatMap(e => e.outils || [])]
+  };
+}
+// Compatibilité (fiches, tests) : état au réglage par défaut.
+export const SONS_VUS = acquisALaPage(PAGE_PAR_DEFAUT).sons;
+export const MOTS_CONNUS = acquisALaPage(PAGE_PAR_DEFAUT).outils;
 
 // ---------- Outils de notation ----------
 export const syllabesDe = m => m.split('-');
 export const sansMarques = m => m.replace(/[-\[\]]/g, '');          // « mou-l[e] » → « moule »
 export const prononce = m => m.replace(/\[[^\]]*\]/g, '').replace(/-/g, ''); // lettres dites seulement
 
-// Un mot (ou une phrase) est-il déchiffrable ? Lettres muettes ignorées, mots connus acceptés.
-export function dechiffrable(texte) {
-  const mots = texte.toLowerCase().replace(/[.,!?]/g, ' ').split(/\s+/).filter(Boolean);
-  return mots.every(w => {
-    if (MOTS_CONNUS.includes(sansMarques(w))) return true;
-    let r = prononce(w);
-    while (r.length) {
-      const g = SONS_VUS.find(s => r.startsWith(s));
-      if (!g) return false;
-      r = r.slice(g.length);
+// Graphèmes de plusieurs lettres. Tant qu'un graphème n'est pas vu, un mot qui le contient n'est PAS
+// déchiffrable, même si ses lettres le sont une à une (« moule » avant « ou » se lirait « mo-u-le »).
+// Ceux qui ne figurent pas dans la progression connue (ai, oi, eu, in…) sont toujours refusés.
+const VOYELLES = 'aeiouyéèêëàâîïôûù';
+const NASALES = ['an', 'am', 'en', 'em', 'on', 'om', 'in', 'im', 'un', 'um', 'ain', 'ein', 'oin', 'ien'];
+const COMPLEXES = ['eau', 'ain', 'ein', 'oin', 'ien', 'ill', 'œu', 'ou', 'au', 'ai', 'ei', 'oi', 'eu', 'ch', 'qu', 'ss', 'gn', 'ph',
+  'an', 'am', 'en', 'em', 'on', 'om', 'in', 'im', 'un', 'um'];
+// Le graphème g commence-t-il vraiment à la position i ? (une nasale suivie d'une voyelle ou d'un
+// n / m doublé se lit lettre à lettre : « a-mi », « u-ne », « co-mme »)
+function graphemeIci(r, i, g) {
+  if (!r.startsWith(g, i)) return false;
+  if (!NASALES.includes(g)) return true;
+  const suivant = r[i + g.length];
+  return !(suivant && (VOYELLES.includes(suivant) || suivant === g[g.length - 1]));
+}
+// Un mot (ou une phrase) est-il déchiffrable à la page donnée ? Lettres muettes ignorées, mots outils
+// acceptés. Règles : 1) aucun graphème complexe non vu ; 2) avant la p. 40 (« z / s »), pas de « s »
+// seul entre deux voyelles (il se dit [z]) ; pas de « er » / « ez » final (se dit [é]) ; pas de c / g
+// doux ; 3) découpage complet en graphèmes vus (avec retour arrière).
+export function dechiffrable(texte, page = pageCourante) {
+  const { sons, outils } = acquisALaPage(page);
+  const decoupable = r => !r.length || sons.some(g => r.startsWith(g) && decoupable(r.slice(g.length)));
+  // w : mot noté (« lu-n[e] »). r = lettres complètes (« lune ») pour le contexte ; muet[i] = lettre grisée.
+  const lisible = w => {
+    const sansTiret = w.replace(/-/g, '');
+    let r = '', muet = [], dedans = false;
+    for (const ch of sansTiret) {
+      if (ch === '[') { dedans = true; continue; }
+      if (ch === ']') { dedans = false; continue; }
+      r += ch; muet.push(dedans);
     }
-    return true;
-  });
+    for (let i = 0; i < r.length; i++) {
+      if (muet[i]) continue;
+      const g = COMPLEXES.find(c => graphemeIci(r, i, c));
+      if (g && !sons.includes(g)) return false;
+      if (r[i] === 's' && r[i + 1] !== 's' && r[i - 1] !== 's' && i > 0 && VOYELLES.includes(r[i - 1]) && VOYELLES.includes(r[i + 1] || '') && !sons.includes('z')) return false;
+      if ('cg'.includes(r[i]) && 'eiyéèê'.includes(r[i + 1] || '')) return false;
+    }
+    const dit = prononce(w);
+    return !/(er|ez)$/.test(dit) && decoupable(dit);
+  };
+  const mots = texte.toLowerCase().replace(/[.,!?]/g, ' ').split(/\s+/).filter(Boolean);
+  return mots.every(w => outils.includes(sansMarques(w)) || lisible(w));
 }
 
 // ---------- Rendu (HTML) ----------
@@ -62,9 +144,13 @@ const SCENES = {
   duo: (a, b) => `<div class="vignette">${img(a, 66)}${img(b, 66)}</div>`,
   seul: a => `<div class="vignette">${img(a, 92)}</div>`,
   dans: a => `<div class="vignette"><span class="dans-malle"><span class="tete">${img(a, 56)}</span>${img('malle', 80)}</span></div>`,
-  cote: a => `<div class="vignette">${img(a, 60)}${img('malle', 66)}</div>`
+  cote: a => `<div class="vignette">${img(a, 60)}${img('malle', 66)}</div>`,
+  // S1.6 : « sur » la malle (un ou deux personnages), « des » = trois objets.
+  sur: (...a) => `<div class="vignette"><span class="sur-malle"><span class="dessus">${a.map(x => img(x, a.length > 1 ? 46 : 56)).join('')}</span>${img('malle', 80)}</span></div>`,
+  trois: a => `<div class="vignette">${img(a, 50)}${img(a, 50)}${img(a, 50)}</div>`,
+  groupe: (a, b) => `<div class="vignette">${img(a, 64)}${img(b, 40)}${img(b, 40)}${img(b, 40)}</div>`
 };
-export function vignette(cle) { // « duo:koala+lama », « dans:loup », « seul:loup », « cote:panda »
+export function vignette(cle) { // « duo:koala+lama », « dans:loup », « seul:loup », « cote:panda », « sur:koala+panda », « trois:moule », « groupe:loup+moule »
   const [type, reste] = cle.split(':');
   return SCENES[type](...reste.split('+'));
 }
@@ -80,33 +166,33 @@ const choixHtml = o => ({ type: 'choixHtml', verifier: r => r === o.attendu, ess
 
 // L1 — Lire le mot → toucher l'image (syllabes écartées, puis le mot entier).
 const l1 = (n, mot, autres) => choixHtml({
-  id: `l1_0${n}`, domaine: 'Lire un mot', libelle: `Lire « ${sansMarques(mot)} » → image`, mot, consigne: 'l1_c',
+  id: `l1_0${n}`, jeu: 'l1', domaine: 'Lire un mot', libelle: `Lire « ${sansMarques(mot)} » → image`, mot, consigne: 'l1_c',
   attendu: mot, choix: placer(mot, autres, n - 1).map(v => ({ v, html: img(IMAGE[v]) })),
   scene: () => ecarteHtml(mot) + grandMot(motHtml(mot)),
   aide: () => grandMot(syllabesHtml(mot)) + `<div class="vignette">${img(IMAGE[mot])}</div>`
 });
 // L2 — Où couper ? (les coupes proposées ; la bonne = syllabes du mot)
-const l2 = (n, mot, coupes) => {
+const l2 = (n, mot, coupes, pre = 'l2') => {
   const bonne = syllabesDe(mot).join('|');
   return choixHtml({
-    id: `l2_${String(n).padStart(2, '0')}`, domaine: 'Découper en syllabes', libelle: `Couper « ${sansMarques(mot)} » en syllabes`,
+    id: `${pre}_${String(n).padStart(2, '0')}`, jeu: 'l2', domaine: 'Découper en syllabes', libelle: `Couper « ${sansMarques(mot)} » en syllabes`,
     mot, consigne: 'l2_c', attendu: bonne, choix: placer(bonne, coupes, n - 1).map(v => ({ v, html: coupeHtml(v) })),
     scene: () => grandMot(motHtml(mot)),
     aide: () => grandMot(syllabesHtml(mot)) + grandMot(coupeHtml(bonne))
   });
 };
 // L3 — Mot inventé entendu → le retrouver écrit
-const l3 = (n, mot, autres) => choixHtml({
-  id: `l3_${String(n).padStart(2, '0')}`, domaine: 'Mots inventés', libelle: `Entendre « ${sansMarques(mot)} » → le mot écrit`,
+const l3 = (n, mot, autres, pre = 'l3') => choixHtml({
+  id: `${pre}_${String(n).padStart(2, '0')}`, jeu: 'l3', domaine: 'Mots inventés', libelle: `Entendre « ${sansMarques(mot)} » → le mot écrit`,
   mot, attendu: mot, choix: placer(mot, autres, n - 1).map(v => ({ v, html: motHtml(v) })),
   scene: () => oreille(),
   aide: () => grandMot(syllabesHtml(mot))
 });
 // L4 — Mot entendu → remettre les syllabes dans l'ordre (+ une syllabe en trop)
-const l4 = (n, mot, enTrop, tuilesOrdre) => {
+const l4 = (n, mot, enTrop, tuilesOrdre, pre = 'l4') => {
   const syl = syllabesDe(mot);
   return {
-    id: `l4_${String(n).padStart(2, '0')}`, type: 'ordre', domaine: 'Construire un mot', libelle: `Construire « ${sansMarques(mot)} » avec les syllabes`,
+    id: `${pre}_${String(n).padStart(2, '0')}`, jeu: 'l4', type: 'ordre', domaine: 'Construire un mot', libelle: `Construire « ${sansMarques(mot)} » avec les syllabes`,
     mot, attendu: syl.join('-'), nb: syl.length, enTrop,
     tuiles: tuilesOrdre.map(i => [...syl, enTrop][i]), // ordre d'affichage figé
     tuileHtml: t => lettresHtml(t),
@@ -116,8 +202,8 @@ const l4 = (n, mot, enTrop, tuilesOrdre) => {
   };
 };
 // L5 — Lire une phrase → toucher l'image
-const l5 = (n, phrase, bonne, autres) => choixHtml({
-  id: `l5_${String(n).padStart(2, '0')}`, domaine: 'Lire une phrase', libelle: `Lire « ${sansMarques(phrase)} » → image`,
+const l5 = (n, phrase, bonne, autres, pre = 'l5') => choixHtml({
+  id: `${pre}_${String(n).padStart(2, '0')}`, jeu: 'l5', domaine: 'Lire une phrase', libelle: `Lire « ${sansMarques(phrase)} » → image`,
   phrase, consigne: 'l5_c', attendu: bonne, choix: placer(bonne, autres, n - 1).map(v => ({ v, html: vignette(v) })),
   scene: () => phraseHtml(phrase),
   aide: () => phraseHtml(phrase) + vignette(bonne)
@@ -184,6 +270,64 @@ const L5 = [
   l5(10, 'Il y a un lou[p].', 'seul:loup', ['seul:lama', 'seul:fee', 'seul:moule'])
 ];
 
+// =====================================================================================
+// S1.6 (09/10) — classe en fin d'unité 1 (p. 24-25) : u, r, syllabes consonne-voyelle-consonne (CVC),
+// mots outils sur, avec, c'est, les, des. Priorité : le découpage (l'un des enfants lit les syllabes mais ne
+// découpe pas les mots) et la différence u / ou, ar / ra.
+// =====================================================================================
+// L6 — Où couper ? Mots avec une syllabe CVC (4 choix ; les coupes fausses gardent toutes les lettres).
+const L6 = [
+  l2(1, 'four-mi', ['fou|rmi', 'f|ourmi', 'fourm|i'], 'l6'),
+  l2(2, 'lar-m[e]', ['la|rm[e]', 'l|arm[e]', 'l|ar|m[e]'], 'l6'),
+  l2(3, 'for-m[e]', ['fo|rm[e]', 'f|orm[e]', 'f|or|m[e]'], 'l6'),
+  l2(4, 'a-mour', ['am|our', 'a|m|our', 'amo|ur'], 'l6'),
+  l2(5, 'mur-mu-r[e]', ['mu|rmu|r[e]', 'm|urmu|r[e]', 'murm|u|r[e]'], 'l6'),
+  l2(6, 'fou-lar[d]', ['foul|ar[d]', 'f|oular[d]', 'fou|l|ar[d]'], 'l6'),
+  l2(7, 'mar-mi-fo', ['ma|rmi|fo', 'm|armi|fo', 'marm|i|fo'], 'l6'),
+  l2(8, 'lour-fa', ['lou|rfa', 'l|ourfa', 'lourf|a'], 'l6'),
+  l2(9, 'ral-mou', ['ra|lmou', 'r|almou', 'ralm|ou'], 'l6'),
+  l2(10, 'fir-lu-mo', ['fi|rlu|mo', 'f|irlu|mo', 'firl|u|mo'], 'l6')
+];
+// L7 — Mots inventés entendus : u / ou, ar / ra, syllabe CVC ou non.
+const L7 = [
+  l3(1, 'ru-mi', ['rou-mi', 'mu-ri', 'ru-ma'], 'l7'),
+  l3(2, 'lou-ra', ['lu-ra', 'ra-lou', 'lou-la'], 'l7'),
+  l3(3, 'mur-fa', ['mour-fa', 'fa-mur', 'mu-fa'], 'l7'),
+  l3(4, 'lir-mo', ['li-mo', 'mo-lir', 'lir-ma'], 'l7'),
+  l3(5, 'fu-lo', ['fou-lo', 'lu-fo', 'fu-la'], 'l7'),
+  l3(6, 'ar-fi', ['ra-fi', 'a-fi', 'ar-fé'], 'l7'),
+  l3(7, 'or-lu', ['ro-lu', 'or-lou', 'o-lu'], 'l7'),
+  l3(8, 'rou-fé', ['ru-fé', 'fé-rou', 'rou-fa'], 'l7'),
+  l3(9, 'mal-ru', ['ma-ru', 'ru-mal', 'mal-rou'], 'l7'),
+  l3(10, 'fur-mi', ['fu-mi', 'four-mi', 'fur-ma'], 'l7')
+];
+// L8 — Mot entendu → syllabes dans l'ordre, avec une syllabe en trop qui ressemble (fou / four…).
+const L8 = [
+  l4(1, 'ra-m[e]', 'mi', [1, 2, 0], 'l8'),
+  l4(2, 'fu-mé', 'mou', [2, 1, 0], 'l8'),
+  l4(3, 'ma-ri', 'ra', [1, 2, 0], 'l8'),
+  l4(4, 'four-mi', 'fou', [2, 1, 0], 'l8'),
+  l4(5, 'a-mour', 'mou', [1, 2, 0], 'l8'),
+  l4(6, 'lar-m[e]', 'la', [2, 1, 0], 'l8'),
+  l4(7, 'ri-r[e]', 'ru', [1, 2, 0], 'l8'),
+  l4(8, 'mur-mu-r[e]', 'mou', [2, 3, 0, 1], 'l8'),
+  l4(9, 'fou-lar[d]', 'la', [1, 2, 0], 'l8'),
+  l4(10, 'ar-mu-r[e]', 'ra', [3, 2, 1, 0], 'l8')
+];
+// L9 — Phrases avec les mots outils sur, avec, c'est, les, des, là.
+const L9 = [
+  l5(1, 'Le lama est sur la mall[e].', 'sur:lama', ['dans:lama', 'sur:loup', 'dans:loup'], 'l9'),
+  l5(2, 'Kali est avec Mila.', 'duo:koala+panda', ['duo:koala+lama', 'duo:panda+loup', 'seul:koala'], 'l9'),
+  l5(3, "C'est un lou[p].", 'seul:loup', ['seul:lama', 'seul:fee', 'seul:momie'], 'l9'),
+  l5(4, 'Il y a des moul[es].', 'trois:moule', ['seul:moule', 'trois:pelote', 'seul:pelote'], 'l9'),
+  l5(5, 'Mila est sur la mall[e].', 'sur:panda', ['dans:panda', 'sur:koala', 'dans:koala'], 'l9'),
+  l5(6, 'La fé[e] est là, avec le lou[p].', 'duo:fee+loup', ['duo:fee+lama', 'duo:momie+loup', 'seul:fee'], 'l9'),
+  l5(7, 'Le lou[p] a des moul[es].', 'groupe:loup+moule', ['duo:loup+moule', 'groupe:lama+moule', 'duo:lama+moule'], 'l9'),
+  l5(8, 'La momi[e] est sur la mall[e].', 'sur:momie', ['dans:momie', 'sur:fee', 'dans:fee'], 'l9'),
+  l5(9, 'Kali est sur la mall[e] avec Mila.', 'sur:koala+panda', ['sur:koala', 'sur:panda', 'duo:koala+panda'], 'l9'),
+  l5(10, 'Il y a des lama[s].', 'trois:lama', ['seul:lama', 'trois:loup', 'seul:loup'], 'l9')
+];
+
 export const PARCOURS_LECTURE = {
   code: 'L', titre: 'Le jeu des mots (lecture)',
   seances: [
@@ -191,7 +335,11 @@ export const PARCOURS_LECTURE = {
     { id: 'L2', objectif: 'Où couper ? Découper un mot en syllabes', items: L2 },
     { id: 'L3', objectif: 'Mots inventés : entendre un mot et le retrouver écrit (déchiffrer sans deviner)', items: L3 },
     { id: 'L4', objectif: 'Construire un mot entendu avec des syllabes (une syllabe en trop)', items: L4 },
-    { id: 'L5', objectif: 'Lire une phrase et toucher la bonne image (un, une, dans, et, est)', items: L5 }
+    { id: 'L5', objectif: 'Lire une phrase et toucher la bonne image (un, une, dans, et, est)', items: L5 },
+    { id: 'L6', objectif: 'Où couper ? Mots avec une syllabe consonne-voyelle-consonne (four-mi, lar-me)', items: L6 },
+    { id: 'L7', objectif: 'Mots inventés : u ou « ou » ? « ar » ou « ra » ?', items: L7 },
+    { id: 'L8', objectif: 'Construire un mot entendu (four ou fou ?) avec une syllabe en trop', items: L8 },
+    { id: 'L9', objectif: 'Lire une phrase avec sur, avec, c\'est, les, des, là', items: L9 }
   ]
 };
 export const ITEMS_LECTURE = PARCOURS_LECTURE.seances.flatMap(s => s.items);
@@ -204,5 +352,22 @@ export const REPERES_LECTURE = {
   'LEC-ENC': 'Écrire un mot entendu avec des syllabes',
   'LEC-PHR': 'Lire et comprendre une phrase courte'
 };
-const REPERE_SEANCE = { l1: 'LEC-MOT', l2: 'LEC-SYL', l3: 'LEC-DEC', l4: 'LEC-ENC', l5: 'LEC-PHR' };
-export const repereLecture = itemId => REPERE_SEANCE[itemId.slice(0, 2)] || null;
+const REPERE_JEU = { l1: 'LEC-MOT', l2: 'LEC-SYL', l3: 'LEC-DEC', l4: 'LEC-ENC', l5: 'LEC-PHR' };
+export const repereLecture = itemId => {
+  const it = ITEMS_LECTURE.find(x => x.id === itemId);
+  return it ? REPERE_JEU[it.jeu] || null : null;
+};
+
+// ---------- Page du manuel nécessaire ----------
+// Tous les textes que l'enfant doit lire dans un item (mot, phrase, mots proposés, coupes, tuiles).
+export function textesItem(it) {
+  return [it.mot, it.phrase, ...(it.tuiles || []),
+    ...(it.type === 'choixHtml' && ['l2', 'l3'].includes(it.jeu) ? it.choix.map(c => c.v.replace(/\|/g, '-')) : [])].filter(Boolean);
+}
+// Première page du Calimot à partir de laquelle TOUTE la séance est déchiffrable (null : jamais).
+export function pageSeance(seance) {
+  for (let p = PAGE_MIN; p <= PAGE_MAX; p++) if (seance.items.every(it => textesItem(it).every(t => dechiffrable(t, p)))) return p;
+  return null;
+}
+export const seanceDisponible = (seance, page = pageCourante) => { const p = pageSeance(seance); return p !== null && p <= page; };
+

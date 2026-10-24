@@ -133,7 +133,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   font-size: 48px; font-weight: 800; display: grid; place-items: center; }
 .curseur { width: 4px; height: 40px; background: var(--orange); animation: clignote 1s steps(2) infinite; }
 @keyframes clignote { 50% { opacity: 0; } }
-.pave { display: grid; grid-template-columns: repeat(3, 76px); gap: 10px; }
+.pave { display: grid; grid-template-columns: repeat(3, 76px); gap: 12px; }
 .touche { height: 62px; border-radius: 18px; background: #fff; box-shadow: var(--ombre); font-size: 32px; font-weight: 800; display: grid; place-items: center; }
 .touche:active { transform: translateY(3px); box-shadow: none; }
 .touche-valider { background: var(--vert); color: #fff; }
@@ -301,15 +301,34 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .dans-malle { position: relative; display: inline-block; padding-top: 30px; }
 .dans-malle .tete { position: absolute; left: 50%; top: 0; transform: translateX(-50%); }
 .dans-malle > svg:last-child { position: relative; z-index: 1; }
-.choix-html { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 18px; }
+.sur-malle { display: inline-flex; flex-direction: column; align-items: center; }
+.sur-malle .dessus { display: flex; gap: 2px; margin-bottom: -10px; position: relative; z-index: 1; }
+.reglage-page { display: flex; align-items: center; gap: 16px; }
+.reglage-page b { font-size: 22px; min-width: 70px; text-align: center; }
+.reglage-page .btn-texte { min-width: 48px; min-height: 48px; font-size: 24px; }
+.choix-html { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-top: 18px; }
 .choix-html.grille { display: grid; grid-template-columns: 1fr 1fr; max-width: 360px; margin-left: auto; margin-right: auto; }
 .btn-choix-html { min-height: 104px; min-width: 104px; padding: 8px 10px; border-radius: 22px; background: #fff; box-shadow: var(--ombre); display: grid; place-items: center; font-size: 34px; }
 .btn-choix-html.ecarte, .btn-choix-html:disabled { opacity: .35; }
 .ordre-cases { display: flex; gap: 10px; justify-content: center; margin: 10px 0 18px; }
 .case-syl { min-width: 84px; height: 72px; border: 3px dashed #c5cbd4; border-radius: 16px; display: grid; place-items: center; font-family: "Andika", "Comic Sans MS", system-ui, sans-serif; font-weight: 700; font-size: 36px; background: #fff; }
 .case-syl.pleine { border-style: solid; border-color: var(--bleu); }
-.ordre-tuiles { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.ordre-tuiles { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 .tuile { min-width: 84px; height: 72px; border-radius: 16px; background: #fff6e8; box-shadow: var(--ombre); font-family: "Andika", "Comic Sans MS", system-ui, sans-serif; font-weight: 700; font-size: 36px; }
 .tuile:disabled { opacity: .25; }
 .ordre-cmd { display: flex; gap: 18px; justify-content: center; align-items: center; margin-top: 18px; }
 .ordre-cmd .btn-grand:disabled { opacity: .4; }
+
+/* ---------- Note du parent (11/10) ---------- */
+.btn-note-parent { position: fixed; left: 14px; bottom: calc(env(safe-area-inset-bottom) + 14px); width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(255,255,255,.55); color: var(--doux); display: grid; place-items: center; opacity: .7; }
+.note-parent textarea { width: 100%; font: inherit; font-size: 16px; padding: 10px; border-radius: 12px; border: 1px solid #d6d3ce; resize: vertical; }
+.note-item { border-top: 1px solid #eee; padding: 10px 0; display: flex; flex-direction: column; gap: 6px; }
+.note-item:first-of-type { border-top: 0; }
+.case-toucher { display: flex; align-items: center; gap: 10px; min-height: 48px; font-weight: 600; }
+.case-toucher input { width: 26px; height: 26px; flex: none; }
+.champ-note { width: 100%; min-height: 44px; font: inherit; font-size: 16px; padding: 8px 10px; border-radius: 10px; border: 1px solid #d6d3ce; }
+.btn-annuler-note { display: block; margin: 8px auto 0; }
+.commentaire-parent { white-space: pre-wrap; background: #fffbea; border-radius: 10px; padding: 10px; }
+.note-toucher { color: #6b4ea0; display: inline-flex; align-items: center; gap: 4px; }
+tr.erreur-toucher td { background: #f4f0fb; }

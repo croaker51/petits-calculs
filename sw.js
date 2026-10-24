@@ -1,12 +1,14 @@
 // Service worker : fonctionnement hors-ligne.
 // Le nom du cache DOIT contenir APP_VERSION (vérifié par tests/test_items.mjs) :
 // changer de version force l'iPhone à recharger les fichiers à l'ouverture suivante.
-const CACHE = 'petits-calculs-0.3.8';
+const CACHE = 'petits-calculs-0.4.0';
 const FICHIERS = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css',
   'js/app.js', 'js/version.js', 'js/stockage.js', 'js/audio.js', 'js/phrases.js', 'js/themes.js', 'js/ui.js',
   'js/rendu.js', 'js/deroule.js', 'js/test/items.js', 'js/test/passation.js', 'js/parent/parent.js',
   'js/seances/parcours.js', 'js/lecture/lecture.js', 'js/seances/seance.js', 'js/seances/ne_sait_pas.js', 'js/suivi/referentiel.js', 'js/suivi/maitrise.js',
+  'js/seances/banque.js', 'js/seances/melange.js', 'js/seances/nombres.js', 'js/phrases_banque.js',
+  'js/parent/note.js', 'js/suivi/annotations.js',
   'icons/icone-180.png', 'icons/icone-192.png', 'icons/icone-512.png',
   'audio/manifest.json', 'audio/silence.mp3'
 ];

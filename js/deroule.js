@@ -12,7 +12,8 @@
 //   apresFin(passation, profil)           // facultatif (ex. niveau « positionné »)
 // }
 import { dire, arreter, reecouter } from './audio.js';
-import { afficher, $, $$, ICONES, attendre } from './ui.js';
+import { afficher, $, $$, ICONES, attendre, surToucher } from './ui.js';
+import { ouvrirNoteParent } from './parent/note.js';
 import { dessin } from './themes.js';
 import * as S from './stockage.js';
 import { APP_VERSION } from './version.js';
@@ -38,7 +39,9 @@ export async function lancerDeroule(config, profil, passationExistante, onQuitte
       fin: null,
       statut: 'en-cours',
       pauses: [],
-      items: []
+      items: [],
+      commentaireParent: null, // note du parent (SCHEMA 2)
+      annotations: {}
     });
   } else {
     pass.statut = 'en-cours';
@@ -147,7 +150,7 @@ function construireSaisie(it) {
       $('#affichage').innerHTML = saisie ? saisie : '<span class="curseur"></span>';
       session.reponseCourante = saisie === '' ? null : parseInt(saisie, 10);
     };
-    $$('.touche[data-n]', z).forEach(b => b.onclick = () => { if (saisie.length < 3) { saisie += b.dataset.n; maj(); } });
+    $$('.touche[data-n]', z).forEach(b => surToucher(b, () => { if (saisie.length < 3) { saisie += b.dataset.n; maj(); } }));
     $('#effacer').onclick = () => { saisie = saisie.slice(0, -1); maj(); };
     $('#valider').onclick = () => { if (session.reponseCourante !== null) valider(); };
     session.reinitialiser = () => { saisie = ''; maj(); };
@@ -155,24 +158,24 @@ function construireSaisie(it) {
 
   if (it.type === 'choix') {
     z.innerHTML = `<div class="choix">${it.choix.map(v => `<button class="btn-choix" data-v="${v}">${v}</button>`).join('')}</div>`;
-    $$('.btn-choix', z).forEach(b => b.onclick = () => {
+    $$('.btn-choix', z).forEach(b => surToucher(b, () => {
       if (b.disabled) return;
       session.reponseCourante = parseInt(b.dataset.v, 10);
       session.boutonChoisi = b;
       valider();
-    });
+    }));
     session.reinitialiser = () => { if (session.boutonChoisi) { session.boutonChoisi.disabled = true; session.boutonChoisi.classList.add('ecarte'); } };
   }
 
   // Lecture (S1.5) : choix parmi des images, des mots ou des coupes (valeur = chaîne).
   if (it.type === 'choixHtml') {
     z.innerHTML = `<div class="choix-html${it.choix.length === 4 ? ' grille' : ''}">${it.choix.map(c => `<button class="btn-choix-html" data-v="${c.v}">${c.html}</button>`).join('')}</div>`;
-    $$('.btn-choix-html', z).forEach(b => b.onclick = () => {
+    $$('.btn-choix-html', z).forEach(b => surToucher(b, () => {
       if (b.disabled) return;
       session.reponseCourante = b.dataset.v;
       session.boutonChoisi = b;
       valider();
-    });
+    }));
     session.reinitialiser = () => { if (session.boutonChoisi) { session.boutonChoisi.disabled = true; session.boutonChoisi.classList.add('ecarte'); } };
   }
 
@@ -194,7 +197,7 @@ function construireSaisie(it) {
       $('#valider').disabled = posees.length !== it.nb;
       session.reponseCourante = posees.length === it.nb ? posees.map(i => it.tuiles[i]).join('-') : null;
     };
-    $$('.tuile', z).forEach(b => b.onclick = () => { if (!b.disabled && posees.length < it.nb) { posees.push(+b.dataset.i); maj(); } });
+    $$('.tuile', z).forEach(b => surToucher(b, () => { if (!b.disabled && posees.length < it.nb) { posees.push(+b.dataset.i); maj(); } }));
     $('#effacer').onclick = () => { posees.pop(); maj(); };
     $('#valider').onclick = () => { if (session.reponseCourante !== null) valider(); };
     session.reinitialiser = () => { posees = []; maj(); };
@@ -381,14 +384,26 @@ async function terminer() {
   pass.synthese = session.config.synthese(pass.items);
   S.sauver();
   if (session.config.apresFin) session.config.apresFin(pass, session.profil);
-  const p = session.profil;
+  const p = session.profil, q = session.onQuitter, config = session.config;
+  session = null;
+  ecranFin(pass, p, q, config, true);
+}
+
+// Écran de fin. Séances (maths et lecture) : petit bouton discret « Note du parent » en bas à gauche,
+// hors des zones de jeu, jamais lu à voix haute ; il demande le code parent (demande de Simon, 11/10).
+function ecranFin(pass, p, q, config, direFin) {
+  const note = config.type === 'seance';
   afficher(`
     <div class="ecran-centre">
       <div class="etoiles">${dessin('etoile', 54)}${dessin('etoile', 70)}${dessin('etoile', 54)}</div>
       <div class="avatar-geant">${dessin(p.avatar, 160)}</div>
       <button class="btn-grand btn-vert" id="fin" aria-label="Terminer">${ICONES.maison}</button>
+      ${note ? `<button class="btn-note-parent" id="noteParent" aria-label="Note du parent">${ICONES.crayon}</button>` : ''}
     </div>`, 'fond-' + p.avatar);
-  const q = session.onQuitter; const phraseFin = session.config.phrases.fin; session = null;
   $('#fin').onclick = () => { arreter(); q && q(); };
-  dire([phraseFin]);
+  if (note) $('#noteParent').onclick = () => {
+    arreter();
+    ouvrirNoteParent(pass, config.items, { demanderCode: true, onFini: () => ecranFin(S.getPassation(pass.id) || pass, p, q, config, false) });
+  };
+  if (direFin) dire([config.phrases.fin]);
 }

@@ -2,6 +2,20 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.4.0 — 2026-10-24
+- **Banque d'exercices de maths (S2.0)** : 409 exercices communs aux deux parcours, en 13 familles et 3 niveaux (tables et nombre manquant, doubles et moitiés, complément à la dizaine, ± 10 et ± dizaines, valeur de position, dictées 60-99 et barres / cubes, droite graduée et ligne 0-100, additions jusqu'à 100, soustractions, problèmes, « vérifie le calcul d'un ami », comparer et suites, groupes égaux). Chaque exercice est rattaché à une compétence du Suivi.
+- **Séances mélangées (M1, M2…)** après la dernière séance fixe du parcours : 15 exercices choisis selon le Suivi (compétences en cours ou non acquises d'abord, essentielles ★ en priorité, 3 révisions, au moins un problème), jamais deux exercices de la même famille à la suite, un exercice n'est pas reproposé avant 14 jours. Le niveau suivant d'une famille s'ouvre sur maîtrise (5 réussites du 1er coup sur les 6 dernières). Une séance en pause reprend avec les mêmes exercices.
+- Espace parent : séances mélangées listées avec leurs résultats ; compteur « + n mélangées ».
+- **Lecture S1.6** : réglage « page du Calimot atteinte » dans l'espace parent (seuls les mots déchiffrables à cette page sont proposés) ; séances L6 (où couper, syllabes consonne-voyelle-consonne), L7 (mots inventés u / ou, ar / ra), L8 (construire un mot, syllabe en trop), L9 (phrases avec sur, avec, c'est, les, des, là).
+- Voix : 846 nouvelles phrases (786 banque + 60 lecture) générées en voix clonée et contrôlées automatiquement (transcription Whisper, nombres comparés un à un, silences, répétitions). 30 phrases douteuses régénérées en 2 ou 3 prises ; la meilleure est retenue automatiquement. Phrases de lecture à syllabes inventées : contrôle par le son approché, sans écoute humaine.
+- Outils : `verifier_audio.py` ajoute une marge de silence avant transcription (Whisper tronquait les phrases courtes) ; `generer_voix_mimika.py` accepte une graine par prise (`<id>__s<n>`) ; nouvel outil `choisir_prises.py`.
+- **Note du parent** (demande de Simon, 11/10) : sur l'écran de fin des séances (maths et lecture), petit bouton crayon en bas à gauche, protégé par le code parent. Commentaire libre sur la séance et, pour chaque exercice raté au 1er essai, une case « Erreur de toucher (ne pas compter) » et une note facultative. Modifiable après coup dans les résultats de l'espace parent (séances et test). Un exercice marqué « erreur de toucher » est retiré du Suivi et du choix des séances mélangées : il ne compte ni comme réussi ni comme raté ; la réponse saisie reste visible.
+- **Toucher plus sûr** : un choix (mots, images, nombres, syllabes, pavé) n'est validé que si le doigt s'est posé sur ce bouton, n'a presque pas glissé (12 px au plus) et s'est relevé dessus. Espacement entre les choix porté à 16 px (mots et images), 14 px (syllabes), 12 px (pavé).
+- Format des données 2 (`SCHEMA_VERSION`) : `commentaireParent` et `annotations` dans chaque passation ; migration automatique des données et des sauvegardes au format 1. Inclus dans l'export ; le code parent n'est jamais exporté.
+- Tests : `test_note_parent.mjs` (migration, import d'une ancienne sauvegarde, exclusion du Suivi et du sélecteur, export, toucher), ajouté avec `test_banque_v05.mjs` à `publier.sh`.
+- Préparé pour la v0.5 (non jouable) : données et 350 phrases des domaines encodage, phonologie, grandeurs et géométrie (`banque_v05.js`), à générer dans le même lot de voix.
+- Tests : `test_banque.mjs` (vérité recalculée, phrases, règle B13), `test_melange.mjs` (simulation sur 40 séances), `test_lecture.mjs` adapté à S1.6.
+
 ## 0.3.8 — 2026-10-09
 - Voix : les 5 phrases de lecture mises en attente (l2_05_e, l2_10_e, l3_04_e, l3_07_e, l4_02_e) ont été écoutées et validées par Simon : voix clonée rétablie. Toutes les phrases (581) sont en voix clonée.
 

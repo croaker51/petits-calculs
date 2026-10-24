@@ -12,6 +12,7 @@
 //  5. Demande de stockage persistant (navigator.storage.persist).
 //  6. Diagnostic affiché dans l'espace parent et joint à l'export.
 import { APP_VERSION, SCHEMA_VERSION } from './version.js';
+import { nettoyerAnnotations, nettoyerCommentaire } from './suivi/annotations.js';
 
 const CLE = 'petitsCalculs.donnees';
 const CLE_SECOURS = 'petitsCalculs.secours';
@@ -76,13 +77,28 @@ async function idbEcrire(cle, valeur) {
 
 function lsLire(cle) { return localStorage.getItem(cle); }
 
+// ---------- Migrations du format (règle A10) ----------
+// 1 → 2 (v0.4.0, note du parent) : chaque passation reçoit commentaireParent (null) et annotations ({}).
+// Les champs sont facultatifs : une passation sans eux reste valide. Ne modifie que l'objet reçu.
+export function migrer(donnees) {
+  if (!donnees || typeof donnees !== 'object') return donnees;
+  if (donnees.schemaVersion === 1) {
+    for (const p of donnees.passations || []) {
+      if (!('commentaireParent' in p)) p.commentaireParent = null;
+      if (!p.annotations || typeof p.annotations !== 'object') p.annotations = {};
+    }
+    donnees.schemaVersion = 2;
+    (donnees.journal = donnees.journal || []).push({ type: 'migration', de: 1, vers: 2, date: new Date().toISOString(), appVersion: APP_VERSION });
+  }
+  return donnees;
+}
+
 // Analyse d'un contenu brut : renvoie l'état s'il est valide, sinon null (et le met de côté).
 function analyser(brut, origine) {
   if (!brut) return null;
   try {
-    const lu = JSON.parse(brut);
+    const lu = migrer(JSON.parse(brut));
     if (lu && lu.schemaVersion === SCHEMA_VERSION && Array.isArray(lu.profils)) return lu;
-    // Migrations futures : if (lu.schemaVersion === 1) { ... }
     diag.alertes.push(`Données ${origine} d'un autre format (${lu && lu.schemaVersion}) : mises de côté.`);
   } catch (e) {
     diag.alertes.push(`Données ${origine} illisibles : mises de côté.`);
@@ -229,6 +245,16 @@ export function getPassations(profilId, type) {
 }
 export function getPassation(id) { return etat.passations.find(x => x.id === id) || null; }
 export function ajouterPassation(pass) { etat.passations.push(pass); sauver(); return pass; }
+// Note du parent (11/10) : commentaire de séance + erreurs de toucher par exercice raté au 1er essai.
+// Écrit dans la passation (donc dans les deux stockages et dans l'export), jamais le code parent.
+export function noterPassation(id, { commentaire, annotations }) {
+  const p = getPassation(id);
+  if (!p) return null;
+  p.commentaireParent = nettoyerCommentaire(commentaire);
+  p.annotations = nettoyerAnnotations(p, annotations);
+  journaliser('note-parent', { passationId: id, erreursToucher: Object.values(p.annotations).filter(a => a.toucher).length });
+  return p;
+}
 export function supprimerPassation(id) {
   etat.passations = etat.passations.filter(x => x.id !== id);
   journaliser('passation-supprimee', { passationId: id });
@@ -280,9 +306,12 @@ export function construireExport() {
 
 export function importer(objet) {
   if (!objet || objet.format !== 'petits-calculs-export') throw new Error('Fichier non reconnu');
-  if (objet.schemaVersion !== SCHEMA_VERSION) throw new Error('Version de format incompatible (' + objet.schemaVersion + ')');
+  // Ancien format : migré à l'import (une sauvegarde v1 reste restaurable). Copie : le fichier lu n'est pas modifié.
+  if (objet.schemaVersion !== 1 && objet.schemaVersion !== SCHEMA_VERSION) throw new Error('Version de format incompatible (' + objet.schemaVersion + ')');
+  const donnees = migrer(JSON.parse(JSON.stringify(objet.donnees || null)));
+  if (!donnees || donnees.schemaVersion !== SCHEMA_VERSION || !Array.isArray(donnees.profils)) throw new Error('Données de format incompatible');
   const config = etat.config; // on garde le code parent actuel
-  etat = { ...objet.donnees, config };
+  etat = { ...donnees, config };
   journaliser('import', { depuisVersion: objet.appVersion, exporteLe: objet.exporteLe });
   sauver();
 }

@@ -2,6 +2,8 @@
 // Les MP3 sont générés à partir de ce fichier (outils/generer_audio.py).
 // Les nombres sont écrits en LETTRES pour que la voix les lise correctement.
 // Toute modification d'un texte impose de régénérer l'audio.
+import { PHRASES_BANQUE } from './phrases_banque.js';
+
 export const PHRASES = {
   // --- Accueil ---
   qui_joue: "Qui joue aujourd'hui ? Touche ton image.",
@@ -620,6 +622,72 @@ export const PHRASES = {
   l5_07_e: "La phrase dit : Le lama a une moule.",
   l5_08_e: "La phrase dit : Mila et Kali.",
   l5_09_e: "La phrase dit : La fée est dans la malle.",
-  l5_10_e: "La phrase dit : Il y a un loup."
+  l5_10_e: "La phrase dit : Il y a un loup.",
+  l6_01_e: "On coupe entre les syllabes : four, mi. Fourmi.",
+  l6_02_e: "On coupe entre les syllabes : lar, me. Le e, en gris, ne se dit pas. Larme.",
+  l6_03_e: "On coupe entre les syllabes : for, me. Le e, en gris, ne se dit pas. Forme.",
+  l6_04_e: "On coupe entre les syllabes : a, mour. Amour.",
+  l6_05_e: "On coupe entre les syllabes : mur, mu, re. Le e, en gris, ne se dit pas. Murmure.",
+  l6_06_e: "On coupe entre les syllabes : fou, lar. Le d, en gris, ne se dit pas. Foulard.",
+  l6_07_e: "On coupe entre les syllabes : mar, mi, fo. Marmifo.",
+  l6_08_e: "On coupe entre les syllabes : lour, fa. Lourfa.",
+  l6_09_e: "On coupe entre les syllabes : ral, mou. Ralmou.",
+  l6_10_e: "On coupe entre les syllabes : fir, lu, mo. Firlumo.",
+  l7_01_c: "Écoute bien : rumi. Touche le mot que tu entends.",
+  l7_01_e: "Le bon mot, c'est celui-ci : ru, mi. Rumi. On entend u, pas ou.",
+  l7_02_c: "Écoute bien : loura. Touche le mot que tu entends.",
+  l7_02_e: "Le bon mot, c'est celui-ci : lou, ra. Loura. On entend ou, pas u.",
+  l7_03_c: "Écoute bien : murfa. Touche le mot que tu entends.",
+  l7_03_e: "Le bon mot, c'est celui-ci : mur, fa. Murfa. On entend u, pas ou.",
+  l7_04_c: "Écoute bien : lirmo. Touche le mot que tu entends.",
+  l7_04_e: "Le bon mot, c'est celui-ci : lir, mo. Lirmo. On entend le r, à la fin de lir.",
+  l7_05_c: "Écoute bien : fulo. Touche le mot que tu entends.",
+  l7_05_e: "Le bon mot, c'est celui-ci : fu, lo. Fulo. On entend u, pas ou.",
+  l7_06_c: "Écoute bien : arfi. Touche le mot que tu entends.",
+  l7_06_e: "Le bon mot, c'est celui-ci : ar, fi. Arfi. On entend a, puis r.",
+  l7_07_c: "Écoute bien : orlu. Touche le mot que tu entends.",
+  l7_07_e: "Le bon mot, c'est celui-ci : or, lu. Orlu. On entend o, puis r.",
+  l7_08_c: "Écoute bien : roufé. Touche le mot que tu entends.",
+  l7_08_e: "Le bon mot, c'est celui-ci : rou, fé. Roufé. On entend ou, pas u.",
+  l7_09_c: "Écoute bien : malru. Touche le mot que tu entends.",
+  l7_09_e: "Le bon mot, c'est celui-ci : mal, ru. Malru. On entend u, pas ou.",
+  l7_10_c: "Écoute bien : furmi. Touche le mot que tu entends.",
+  l7_10_e: "Le bon mot, c'est celui-ci : fur, mi. Furmi. On entend u, pas ou.",
+  l8_01_c: "Écoute : rame. Remets les syllabes dans l'ordre, puis touche le bouton vert.",
+  l8_01_e: "Dans l'ordre : ra, me. Le e, en gris, ne se dit pas. Rame.",
+  l8_02_c: "Écoute : fumé. Remets les syllabes dans l'ordre, puis touche le bouton vert.",
+  l8_02_e: "Dans l'ordre : fu, mé. Fumé.",
+  l8_03_c: "Écoute : mari. Remets les syllabes dans l'ordre, puis touche le bouton vert.",
+  l8_03_e: "Dans l'ordre : ma, ri. Mari.",
+  l8_04_c: "Écoute : fourmi. Remets les syllabes dans l'ordre, puis touche le bouton vert.",
+  l8_04_e: "Dans l'ordre : four, mi. Fourmi. Four, avec un r à la fin.",
+  l8_05_c: "Écoute : amour. Remets les syllabes dans l'ordre, puis touche le bouton vert.",
+  l8_05_e: "Dans l'ordre : a, mour. Amour.",
+  l8_06_c: "Écoute : larme. Remets les syllabes dans l'ordre, puis touche le bouton vert.",
+  l8_06_e: "Dans l'ordre : lar, me. Le e, en gris, ne se dit pas. Larme.",
+  l8_07_c: "Écoute : rire. Remets les syllabes dans l'ordre, puis touche le bouton vert.",
+  l8_07_e: "Dans l'ordre : ri, re. Le e, en gris, ne se dit pas. Rire.",
+  l8_08_c: "Écoute : murmure. Remets les syllabes dans l'ordre, puis touche le bouton vert.",
+  l8_08_e: "Dans l'ordre : mur, mu, re. Le e, en gris, ne se dit pas. Murmure.",
+  l8_09_c: "Écoute : foulard. Remets les syllabes dans l'ordre, puis touche le bouton vert.",
+  l8_09_e: "Dans l'ordre : fou, lar. Le d, en gris, ne se dit pas. Foulard.",
+  l8_10_c: "Écoute : armure. Remets les syllabes dans l'ordre, puis touche le bouton vert.",
+  l8_10_e: "Dans l'ordre : ar, mu, re. Le e, en gris, ne se dit pas. Armure.",
+  l9_01_e: "La phrase dit : Le lama est sur la malle.",
+  l9_02_e: "La phrase dit : Kali est avec Mila.",
+  l9_03_e: "La phrase dit : C'est un loup.",
+  l9_04_e: "La phrase dit : Il y a des moules.",
+  l9_05_e: "La phrase dit : Mila est sur la malle.",
+  l9_06_e: "La phrase dit : La fée est là, avec le loup.",
+  l9_07_e: "La phrase dit : Le loup a des moules.",
+  l9_08_e: "La phrase dit : La momie est sur la malle.",
+  l9_09_e: "La phrase dit : Kali est sur la malle avec Mila.",
+  l9_10_e: "La phrase dit : Il y a des lamas."
 
 };
+
+// Banque d'exercices (S2.0) : phrases générées dans phrases_banque.js (outils/banque_phrases.mjs).
+for (const [k, v] of Object.entries(PHRASES_BANQUE)) {
+  if (k in PHRASES) throw new Error('phrase en double : ' + k);
+  PHRASES[k] = v;
+}

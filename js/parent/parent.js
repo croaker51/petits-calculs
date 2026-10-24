@@ -5,11 +5,14 @@ import { dessin, AVATARS, THEMES, LIBELLES } from '../themes.js';
 import { ITEMS, LIBELLES_CLASSEMENT, synthese } from '../test/items.js';
 import { PARCOURS } from '../seances/parcours.js';
 import { LIBELLES_SEANCE, syntheseSeance } from '../seances/ne_sait_pas.js';
-import { prochaineSeance, seancesTerminees, getParcours } from '../seances/seance.js';
+import { prochaineSeance, seancesTerminees, getParcours, pageCalimot, estMelangee, seanceMelangeeDe, OBJECTIF_MELANGE } from '../seances/seance.js';
+import { acquisALaPage, pageSeance, reglerPage } from '../lecture/lecture.js';
 import { APP_VERSION, SCHEMA_VERSION } from '../version.js';
 import { infoAudio, dire, arreter, deverrouillerAudio } from '../audio.js';
 import { CLASSES, DOMAINES, AXES, SOURCE, periodeApprochee } from '../suivi/referentiel.js';
 import { bilan, evolution, attenduMaintenant, CRITERE, LIBELLES_STATUT } from '../suivi/maitrise.js';
+import { estErreurToucher, nbErreursToucher } from '../suivi/annotations.js';
+import { ouvrirNoteParent } from './note.js';
 
 let retourEnfants = null;
 
@@ -102,10 +105,12 @@ function etatTest(profilId) {
 function etatSeances(p) {
   const parcours = PARCOURS[p.parcours];
   if (!parcours) return 'Parcours : à choisir (Modifier)';
-  const faites = new Set(seancesTerminees(p.id, parcours.code).map(x => x.seanceId)).size;
+  const terminees = seancesTerminees(p.id, parcours.code);
+  const faites = new Set(terminees.filter(x => !estMelangee(x.seanceId)).map(x => x.seanceId)).size;
+  const melangees = terminees.filter(x => estMelangee(x.seanceId)).length;
   const pro = prochaineSeance(p);
   const ouverte = pro && pro.passation;
-  return `Parcours ${parcours.code} · ${faites}/${parcours.seances.length} séances` +
+  return `Parcours ${parcours.code} · ${faites}/${parcours.seances.length} séances` + (melangees ? ` + ${melangees} mélangée${melangees > 1 ? 's' : ''}` : '') +
     (ouverte ? ` · ${pro.seance.id} en pause (${ouverte.items.length}/${pro.seance.items.length})` : pro ? ` · prochaine : ${pro.seance.id}` : ' · parcours terminé');
 }
 
@@ -143,6 +148,16 @@ function tableauDeBord() {
         <p class="message" id="msg-export"></p>
       </section>
       <section>
+        <h2>Lecture : page du Calimot</h2>
+        <p class="aide-texte">Indiquez la page du manuel où en est la classe. Le jeu des mots n'utilise que les sons et les mots outils déjà vus à cette page (réglage commun aux enfants).</p>
+        <div class="reglage-page">
+          <button class="btn-texte" id="page-moins" aria-label="Page précédente">−</button>
+          <b id="page-calimot">p. ${pageCalimot()}</b>
+          <button class="btn-texte" id="page-plus" aria-label="Page suivante">+</button>
+        </div>
+        <p class="aide-texte" id="page-detail"></p>
+      </section>
+      <section>
         <h2>Réglages</h2>
         <button class="btn-texte" id="voix">Tester la voix</button>
         <button class="btn-texte" id="changer-code">Changer le code</button>
@@ -161,6 +176,16 @@ function tableauDeBord() {
   $$('[data-suivi]').forEach(b => b.onclick = () => suivi(b.dataset.suivi));
   $$('[data-seances]').forEach(b => b.onclick = () => listeSeances(b.dataset.seances));
   $$('[data-lecture]').forEach(b => b.onclick = () => listeSeances(b.dataset.lecture, 'L'));
+  const majPage = () => {
+    const page = pageCalimot();
+    const a = acquisALaPage(page);
+    $('#page-calimot').textContent = `p. ${page}`;
+    $('#page-detail').innerHTML = `Sons vus : ${esc(a.sons.join(', ') || 'aucun')}<br>Mots outils : ${esc(a.outils.filter(m => m !== 'kali').join(', ') || 'aucun')}`;
+  };
+  const changerPage = d => { S.definirReglage('pageCalimot', reglerPage(pageCalimot() + d)); majPage(); };
+  $('#page-moins').onclick = () => changerPage(-1);
+  $('#page-plus').onclick = () => changerPage(+1);
+  majPage();
   $('#exporter').onclick = exporter;
   $('#importer').onchange = importer;
   $('#changer-code').onclick = ecranCreationCode;
@@ -258,7 +283,7 @@ function barreTemps(ms, max) {
 function contexteResultats(pass) {
   if (pass.type === 'seance') {
     const pc = getParcours(pass.parcours);
-    const se = pc && pc.seances.find(x => x.id === pass.seanceId);
+    const se = (pc && pc.seances.find(x => x.id === pass.seanceId)) || seanceMelangeeDe(pass);
     return { items: se ? se.items : [], libelles: LIBELLES_SEANCE, syn: syntheseSeance(pass.items),
       titre: `séance ${pass.seanceId}`, objectif: se ? se.objectif : '' };
   }
@@ -284,7 +309,11 @@ function resultats(passId, retour = tableauDeBord) {
     if (r && r.neSaitPas) notes.push(`« je ne sais pas » après ${fmtTemps(r.neSaitPas.tempsMs)}`);
     if (r && r.piegesAtteints) notes.push(...r.piegesAtteints);
     if (r && r.nspAnnules) notes.push(`« ? » touché puis annulé (${r.nspAnnules})`);
-    return `<tr class="cl-${cl}">
+    const toucher = r && estErreurToucher(pass, it.id);
+    const ann = pass.annotations && pass.annotations[it.id];
+    if (toucher) notes.push(`<span class="note-toucher">${ICONES.doigt} erreur de toucher signalée par le parent : ne compte pas dans le Suivi</span>`);
+    if (ann && ann.note) notes.push(`note du parent : ${esc(ann.note)}`);
+    return `<tr class="cl-${cl}${toucher ? ' erreur-toucher' : ''}">
       <td><b>${esc(it.id)}</b> ${esc(it.libelle)}<br><small>${esc(it.domaine)}</small>${r && tempsPremierEssai(r) != null ? `<div class="temps-item"><small>Temps : ${fmtTemps(tempsPremierEssai(r))}</small>${barreTemps(tempsPremierEssai(r), tempsMax)}</div>` : ''}${notes.length ? `<br><small class="note">${notes.join(' · ')}</small>` : ''}</td>
       <td>${esc(String(it.attendu))}</td>
       <td>${e1 ? `${fmtRep(e1.reponse)}<br><small>${fmtTemps(e1.tempsMs)}</small>` : ''}</td>
@@ -306,6 +335,12 @@ function resultats(passId, retour = tableauDeBord) {
         ${pass.type === 'seance' ? `<div class="kpi cl-ne-sait-pas"><b>${nsp}</b><small>« je ne sais pas »</small></div>` : ''}
         <div class="kpi"><b>${faits}/${total}</b><small>passés</small></div>
         ${tempsMedian != null ? `<div class="kpi"><b>${fmtTemps(tempsMedian)}</b><small>temps médian (réussis du 1er coup)</small></div>` : ''}
+        ${nbErreursToucher(pass) ? `<div class="kpi"><b>${nbErreursToucher(pass)}</b><small>erreur(s) de toucher (ne comptent pas)</small></div>` : ''}
+      </section>
+      <section>
+        <h2>Note du parent</h2>
+        ${pass.commentaireParent ? `<p class="commentaire-parent">${esc(pass.commentaireParent.texte)}</p><p class="aide-texte">Écrite le ${new Date(pass.commentaireParent.date).toLocaleString('fr-FR')}</p>` : '<p class="aide-texte">Aucun commentaire.</p>'}
+        <button class="btn-texte" id="noteParent">${ICONES.crayon} ${pass.commentaireParent || nbErreursToucher(pass) ? 'Modifier la note' : 'Ajouter une note'}</button>
       </section>
       <p class="aide-texte">Commencé le ${new Date(pass.debut).toLocaleString('fr-FR')}${pass.fin ? ' · fini le ' + new Date(pass.fin).toLocaleString('fr-FR') : ''} · appli ${esc(pass.appVersion)}.
       « Réussi au 2e essai » = l'enfant savait mais s'est précipité. Le temps est compté depuis la fin de la consigne orale.</p>
@@ -315,6 +350,7 @@ function resultats(passId, retour = tableauDeBord) {
         <tbody>${lignes}</tbody></table></div>
     </div>`, 'mode-parent');
   $('#retour').onclick = () => retour();
+  $('#noteParent').onclick = () => ouvrirNoteParent(pass, ctx.items, { demanderCode: false, onFini: () => resultats(passId, retour) });
 }
 
 // Liste des séances du parcours d'un enfant, avec leur état et l'accès aux résultats.
@@ -328,16 +364,26 @@ function listeSeances(profilId, code) {
     const ouvert = ps.find(x => x.statut !== 'termine');
     const pass = fini || ouvert;
     const syn = pass ? syntheseSeance(pass.items) : null;
-    const etat = fini ? `Terminée le ${new Date(fini.fin).toLocaleDateString('fr-FR')} · ${syn['reussi-1er']}/${se.items.length} du 1er coup`
+    const pageMin = pc.code === 'L' ? pageSeance(se) : null;
+    const bloquee = pc.code === 'L' && !fini && !ouvert && (pageMin === null || pageMin > pageCalimot());
+    const etat = bloquee ? `À partir de la p. ${pageMin ?? '?'} du Calimot` : fini ? `Terminée le ${new Date(fini.fin).toLocaleDateString('fr-FR')} · ${syn['reussi-1er']}/${se.items.length} du 1er coup`
       : ouvert ? `En pause (${ouvert.items.length}/${se.items.length})` : 'Pas encore faite';
     return `<div class="carte-profil"><div><b>${se.id}</b> <small>${esc(se.objectif)}</small><br><small>${etat}</small></div>
       ${pass ? `<div class="cp-actions"><button class="btn-texte" data-res="${pass.id}">Résultats</button></div>` : ''}</div>`;
+  }).join('') + passations.filter(x => estMelangee(x.seanceId)).map(pass => {
+    // Séances mélangées (banque S2.0) : une ligne par passation, la plus récente en bas.
+    const syn = syntheseSeance(pass.items);
+    const n = (pass.itemsChoisis || []).length;
+    const etat = pass.statut === 'termine' ? `Terminée le ${new Date(pass.fin).toLocaleDateString('fr-FR')} · ${syn['reussi-1er']}/${n} du 1er coup`
+      : `En pause (${pass.items.length}/${n})`;
+    return `<div class="carte-profil"><div><b>${pass.seanceId}</b> <small>${esc(OBJECTIF_MELANGE)}</small><br><small>${etat}</small></div>
+      <div class="cp-actions"><button class="btn-texte" data-res="${pass.id}">Résultats</button></div></div>`;
   }).join('');
   afficher(`
     <div class="parent">
       <header class="entete-parent"><h1>${esc(p.prenom)} — parcours ${pc.code}</h1>
         <button class="btn-texte" id="retour">Retour</button></header>
-      <p class="aide-texte">${esc(pc.titre)}. Les séances s'enchaînent dans l'ordre ; une séance en pause est reprise là où elle s'est arrêtée.</p>
+      <p class="aide-texte">${esc(pc.titre)}. Les séances s'enchaînent dans l'ordre ; une séance en pause est reprise là où elle s'est arrêtée.${pc.code !== 'L' ? ' Après la dernière séance, l\'appli propose des séances mélangées (M1, M2…) choisies selon le Suivi.' : ''}</p>
       <section>${lignes}</section>
     </div>`, 'mode-parent');
   $('#retour').onclick = tableauDeBord;

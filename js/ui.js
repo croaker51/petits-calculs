@@ -27,7 +27,30 @@ export const ICONES = {
   suivant: '<svg viewBox="0 0 24 24" width="38" height="38"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   cadenas: '<svg viewBox="0 0 24 24" width="22" height="22"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
   livre: '<svg viewBox="0 0 24 24" width="40" height="40"><path d="M3 5.5C5.5 4.5 8.5 4.5 12 6.5c3.5-2 6.5-2 9-1V19c-2.5-1-5.5-1-9 1-3.5-2-6.5-2-9-1z" fill="#fff" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 6.5V20" stroke="currentColor" stroke-width="1.8"/></svg>',
-  maison: '<svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z" fill="currentColor"/></svg>'
+  maison: '<svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z" fill="currentColor"/></svg>',
+  crayon: '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 20l1-4L16 5l3 3L8 19z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 7l3 3" stroke="currentColor" stroke-width="2"/></svg>',
+  doigt: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 11V4.5a1.5 1.5 0 0 1 3 0V10l5 1.2c1 .3 1.6 1.2 1.4 2.2L17.6 19a2 2 0 0 1-2 1.6H11a2 2 0 0 1-1.6-.8L6 15.5a1.4 1.4 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'
 };
+
+// Réponse au TOUCHER, robuste aux frôlements (11/10, erreurs de toucher signalées par Simon en L3).
+// Un clic n'est accepté que si le doigt s'est posé SUR ce bouton (pointerdown), n'a presque pas bougé
+// (≤ GLISSE_MAX px) et s'est relevé à l'intérieur du bouton. Un doigt qui glisse d'un bouton à l'autre
+// n'envoie donc rien. Les clics sans pointeur (clavier, lecteur d'écran : detail = 0) restent acceptés.
+export const GLISSE_MAX = 12;
+export function surToucher(el, action) {
+  let depart = null;
+  el.addEventListener('pointerdown', e => { depart = { x: e.clientX, y: e.clientY }; });
+  el.addEventListener('pointercancel', () => { depart = null; });
+  el.onclick = e => {
+    if (e.detail !== 0) {
+      const d = depart; depart = null;
+      if (!d) return;                                                     // doigt posé ailleurs
+      if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > GLISSE_MAX) return; // doigt qui a glissé
+      const r = el.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return; // relevé hors du bouton
+    }
+    action(e);
+  };
+}
 
 export const attendre = ms => new Promise(r => setTimeout(r, ms));

@@ -17,6 +17,8 @@
 // Repères datés pour le CP (seuls donnés par le programme) : nombres jusqu'à 59 au plus tard en
 // période 2, jusqu'à 100 au plus tard en période 3. Le reste : « fin de l'année » de la classe.
 
+import { COMPETENCE_BANQUE } from '../seances/banque.js';
+
 export const SOURCE = 'Programme de mathématiques du cycle 2 — annexe 4, BO n° 41 du 31 octobre 2024';
 export const CLASSES = ['CP', 'CE1', 'CE2', 'Hors programme'];
 export const DOMAINES = { N: 'Nombres', F: 'Fractions', O: 'Opérations', C: 'Calcul mental', P: 'Problèmes', R: 'Raisonnement' };
@@ -152,6 +154,12 @@ export const ITEM_COMPETENCE = {
   c7_01: 'CP-C1', c7_02: 'CP-C1', c7_03: 'CP-C3', c7_04: 'CP-C3', c7_05: 'CP-C11', c7_06: 'CP-C7', c7_07: 'CP-P1',
   c7_08: 'CP-P1', c7_09: 'CP-P1', c7_10: 'CP-P1', c7_11: 'CP-P1', c7_12: 'CP-O1', c7_13: 'CP-O1', c7_14: 'CP-C11', c7_15: 'CP-C1'
 };
+
+// Banque d'exercices (S2.0) : chaque item porte sa compétence (banque.js).
+for (const [id, code] of Object.entries(COMPETENCE_BANQUE)) {
+  if (id in ITEM_COMPETENCE) throw new Error('item en double : ' + id);
+  ITEM_COMPETENCE[id] = code;
+}
 
 // Compétences effectivement travaillées par au moins un item de l'appli.
 export const TRAVAILLEES = new Set(Object.values(ITEM_COMPETENCE));

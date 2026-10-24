@@ -8,7 +8,9 @@
 //  PAS ENCORE ÉVALUÉE : travaillée dans l'appli mais jamais observée pour cet enfant.
 //  NON TRAVAILLÉE DANS L'APPLI : aucun item ne la vise (on ne peut rien en dire).
 // « Ne sait pas », réussite au 2e essai et non acquis comptent comme non réussis du 1er coup.
+// Un exercice marqué « erreur de toucher » par le parent (annotations.js) n'est PAS une observation.
 import { COMPETENCES, ITEM_COMPETENCE, TRAVAILLEES } from './referentiel.js';
+import { estErreurToucher } from './annotations.js';
 
 export const CRITERE = { fenetre: 6, reussis: 5, passations: 3, minNonAcquis: 3 };
 
@@ -27,6 +29,7 @@ export function observations(passations) {
     (p.items || []).forEach((r, rang) => {
       const code = ITEM_COMPETENCE[r.itemId];
       if (!code || !r.classement || r.classement === 'non-passe' || r.classement === 'en-cours') return;
+      if (estErreurToucher(p, r.itemId)) return; // erreur de toucher signalée par le parent : ne compte pas
       obs.push({ code, itemId: r.itemId, passationId: p.id, date, rang, premier: r.classement === 'reussi-1er' });
     });
   }
