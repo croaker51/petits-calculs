@@ -2,6 +2,9 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.4.1 — 2026-10-25
+- **Mises à jour plus rapides** : l'appli demande à chaque ouverture et à chaque retour au premier plan s'il existe une nouvelle version, et se recharge d'elle-même dès qu'elle l'a reçue, uniquement sur l'écran « Qui joue ? » ou l'accueil d'un enfant (jamais pendant le test, une séance ou l'espace parent). Constat : la 0.3.7 était encore utilisée 8 jours après la publication de la 0.3.8. Les données sont enregistrées avant le rechargement.
+
 ## 0.4.0 — 2026-10-24
 - **Banque d'exercices de maths (S2.0)** : 409 exercices communs aux deux parcours, en 13 familles et 3 niveaux (tables et nombre manquant, doubles et moitiés, complément à la dizaine, ± 10 et ± dizaines, valeur de position, dictées 60-99 et barres / cubes, droite graduée et ligne 0-100, additions jusqu'à 100, soustractions, problèmes, « vérifie le calcul d'un ami », comparer et suites, groupes égaux). Chaque exercice est rattaché à une compétence du Suivi.
 - **Séances mélangées (M1, M2…)** après la dernière séance fixe du parcours : 15 exercices choisis selon le Suivi (compétences en cours ou non acquises d'abord, essentielles ★ en priorité, 3 révisions, au moins un problème), jamais deux exercices de la même famille à la suite, un exercice n'est pas reproposé avant 14 jours. Le niveau suivant d'une famille s'ouvre sur maîtrise (5 réussites du 1er coup sur les 6 dernières). Une séance en pause reprend avec les mêmes exercices.

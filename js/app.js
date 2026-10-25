@@ -8,6 +8,33 @@ import { lancerSeance, prochaineSeance } from './seances/seance.js';
 import { ouvrirParent } from './parent/parent.js';
 
 let audioDeverrouille = false;
+
+// Mise à jour (v0.4.1) : une PWA iOS restée en arrière-plan gardait l'ancienne version
+// plusieurs jours (0.3.7 utilisée 8 jours après la publication de 0.3.8). On demande donc
+// au navigateur de vérifier sw.js à chaque ouverture / retour au premier plan, et on recharge
+// dès qu'une nouvelle version a pris la main — seulement sur les écrans « Qui joue ? » et
+// accueil de l'enfant, jamais pendant le test, une séance ou l'espace parent.
+let ecranSansRisque = false;
+let rechargementEnAttente = false;
+function marquerEcran(sansRisque) {
+  ecranSansRisque = sansRisque;
+  if (sansRisque && rechargementEnAttente) recharger();
+}
+function recharger() {
+  if (S.aDesDonnees()) S.sauver();
+  location.reload();
+}
+function surveillerMisesAJour(reg) {
+  const verifier = () => { reg.update().catch(() => {}); };
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') verifier(); });
+  // Sans contrôleur au départ (1re installation), la prise de contrôle n'est pas une mise à jour.
+  if (!navigator.serviceWorker.controller) return;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (rechargementEnAttente) return;
+    rechargementEnAttente = true;
+    if (ecranSansRisque) recharger();
+  });
+}
 function premierToucher() {
   if (audioDeverrouille) return;
   audioDeverrouille = true;
@@ -17,8 +44,9 @@ function premierToucher() {
 // Écran 1 : « Qui joue ? » — un grand bouton par enfant.
 function choixEnfant() {
   arreter();
+  marquerEcran(true);
   const profils = S.getProfils();
-  if (!profils.length) return ouvrirParent(choixEnfant);
+  if (!profils.length) { marquerEcran(false); return ouvrirParent(choixEnfant); }
   afficher(`
     <div class="ecran-choix">
       <div class="liste-enfants">
@@ -29,13 +57,14 @@ function choixEnfant() {
       <button class="btn-parent" id="parent" aria-label="Espace parent">${ICONES.cadenas}</button>
     </div>`, 'fond-neutre');
   $$('.carte-enfant').forEach(b => b.onclick = () => { premierToucher(); accueilEnfant(S.getProfil(b.dataset.id)); });
-  $('#parent').onclick = () => { premierToucher(); ouvrirParent(choixEnfant); };
+  $('#parent').onclick = () => { premierToucher(); marquerEcran(false); ouvrirParent(choixEnfant); };
   $('#ecouter').onclick = () => { premierToucher(); dire('qui_joue'); };
   if (audioDeverrouille) dire('qui_joue');
 }
 
 // Écran 2 : accueil de l'enfant, avec ses thèmes en décor.
 function accueilEnfant(p) {
+  marquerEcran(true);
   // 1. Le test de départ d'abord (ou sa reprise). 2. Puis les séances du parcours choisi par le parent.
   const testOuvert = passationOuverte(p.id);
   const testFini = testTermine(p.id);
@@ -69,9 +98,9 @@ function accueilEnfant(p) {
   $('#retour').onclick = choixEnfant;
   $('#ecouter').onclick = () => reecouter();
   const j = $('#jouer');
-  if (j) j.onclick = () => { arreter(); jouer(); };
+  if (j) j.onclick = () => { arreter(); marquerEcran(false); jouer(); };
   const l = $('#lire');
-  if (l) l.onclick = () => { arreter(); lire(); };
+  if (l) l.onclick = () => { arreter(); marquerEcran(false); lire(); };
   dire(['bonjour_' + p.avatar, suite]);
 }
 
@@ -84,7 +113,11 @@ async function demarrer() {
   await initAudio();
   // Enregistrement du service worker (hors-ligne). Ignoré si non disponible.
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    try { await navigator.serviceWorker.register('sw.js'); } catch (e) { console.warn('SW', e); }
+    try {
+      const reg = await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+      surveillerMisesAJour(reg);
+      reg.update().catch(() => {});
+    } catch (e) { console.warn('SW', e); }
   }
   document.addEventListener('touchstart', premierToucher, { once: true, passive: true });
   document.addEventListener('click', premierToucher, { once: true });
