@@ -112,6 +112,16 @@ const D = {
     <path d="M10 46 Q10 22 50 22 Q90 22 90 46 Z" fill="#bd7b46" stroke="#6e4224" stroke-width="2.5" stroke-linejoin="round"/>
     <rect x="24" y="22" width="8" height="68" fill="#d9a520" opacity=".85"/><rect x="68" y="22" width="8" height="68" fill="#d9a520" opacity=".85"/>
     <rect x="43" y="50" width="14" height="14" rx="3" fill="#f6c945" stroke="#b8860b" stroke-width="2"/>`,
+  // Malle OUVERTE (S1.6 bis, 31/10) : « dans » doit se distinguer de « sur » au premier coup d'œil.
+  // Fond = couvercle relevé + intérieur sombre ; devant = paroi avant, posée PAR-DESSUS le personnage.
+  malle_ouverte_fond: `
+    <path d="M12 46 L6 6 Q50 -2 94 6 L88 46 Z" fill="#9c6235" stroke="#6e4224" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M24 46 L20 4 L28 3.5 L32 46 Z M68 46 L72 3.5 L80 4 L76 46 Z" fill="#d9a520" opacity=".85"/>
+    <rect x="10" y="44" width="80" height="12" fill="#3b2414" stroke="#6e4224" stroke-width="2.5"/>`,
+  malle_ouverte_devant: `
+    <rect x="10" y="52" width="80" height="38" rx="5" fill="#a8693a" stroke="#6e4224" stroke-width="2.5"/>
+    <rect x="24" y="52" width="8" height="38" fill="#d9a520" opacity=".85"/><rect x="68" y="52" width="8" height="38" fill="#d9a520" opacity=".85"/>
+    <rect x="43" y="56" width="14" height="12" rx="3" fill="#f6c945" stroke="#b8860b" stroke-width="2"/>`,
   momie: `
     <path d="M30 30 Q30 10 50 10 Q70 10 70 30 L72 88 Q72 94 64 94 L36 94 Q28 94 28 88 Z" fill="#f4efe2" stroke="#b9ae93" stroke-width="2.5"/>
     <path d="M30 24 L70 30 M29 44 L71 38 M29 56 L71 62 M28 74 L72 68 M28 86 L72 88" stroke="#d8cfb8" stroke-width="3" stroke-linecap="round"/>

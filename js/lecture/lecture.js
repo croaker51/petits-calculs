@@ -46,7 +46,9 @@ export const PROGRESSION_CALIMOT = [
 export const PAGE_MIN = 11, PAGE_MAX = 45;
 export const PAGE_PAR_DEFAUT = 25; // classe en fin d'unité 1 au 09/10 (Simon)
 // Mots toujours acceptés : le nom du koala du manuel (k non vu au début).
-const TOUJOURS_CONNUS = ['kali'];
+// S1.7 (31/10) : prénoms des histoires de Léon (petits textes de fin de séance), lus globalement comme Kali ;
+// la consigne orale annonce les prénoms de l'histoire, sans lire le texte.
+const TOUJOURS_CONNUS = ['kali', 'léon', 'paola', 'anna'];
 
 // Page réglée dans l'espace parent (réglage commun aux enfants : même classe).
 let pageCourante = PAGE_PAR_DEFAUT;
@@ -143,7 +145,9 @@ const img = (nom, t = 92) => dessin(nom, t);
 const SCENES = {
   duo: (a, b) => `<div class="vignette">${img(a, 66)}${img(b, 66)}</div>`,
   seul: a => `<div class="vignette">${img(a, 92)}</div>`,
-  dans: a => `<div class="vignette"><span class="dans-malle"><span class="tete">${img(a, 56)}</span>${img('malle', 80)}</span></div>`,
+  // « dans » : malle ouverte, le personnage sort à moitié de l'intérieur (correctif 31/10 : l'ancien dessin,
+  // tête posée sur une malle fermée, se confondait avec « sur » — signalé par Simon).
+  dans: a => `<div class="vignette"><span class="dans-malle">${img('malle_ouverte_fond', 80)}<span class="dedans">${img(a, 60)}</span>${img('malle_ouverte_devant', 80)}</span></div>`,
   cote: a => `<div class="vignette">${img(a, 60)}${img('malle', 66)}</div>`,
   // S1.6 : « sur » la malle (un ou deux personnages), « des » = trois objets.
   sur: (...a) => `<div class="vignette"><span class="sur-malle"><span class="dessus">${a.map(x => img(x, a.length > 1 ? 46 : 56)).join('')}</span>${img('malle', 80)}</span></div>`,
@@ -328,6 +332,69 @@ const L9 = [
   l5(10, 'Il y a des lama[s].', 'trois:lama', ['seul:lama', 'trois:loup', 'seul:loup'], 'l9')
 ];
 
+// =====================================================================================
+// S1.7 (31/10) — classe à la p. 27 (réglage parent) : v, ch. D'après les séances L6-L9 des deux enfants :
+// syllabes fermées (CVC) encore fragiles, u / ou et ar / ra confondus, « sur » / « dans » faussés par l'ancien
+// dessin (corrigé : malle ouverte pour « dans »).
+// =====================================================================================
+// Petit texte (fin de séance, demande de Simon 31/10) : une histoire de Léon, de plus en plus longue
+// (4 phrases, puis 5, puis 6…). Une phrase par ligne. L'enfant lit, puis touche le mot qui manque dans la
+// question (« … »). Le texte reste affiché pendant la question. La voix ne lit le texte qu'en explication.
+const trouHtml = q => `<div class="lecture-question">${q.split('…').map(lettresHtml).join('<span class="trou">…</span>')}</div>`;
+const texteHtml = t => `<div class="lecture-texte">${t.map(phraseHtml).join('')}</div>`;
+const l6 = (pre, texte, question, bonne, autres, rang) => choixHtml({
+  id: `${pre}_11`, jeu: 'l6', domaine: 'Lire un petit texte', libelle: `Petit texte (${texte.length} phrases) → « ${sansMarques(bonne)} »`,
+  mot: bonne, texte, question, attendu: bonne, choix: placer(bonne, autres, rang).map(v => ({ v, html: motHtml(v) })),
+  scene: () => texteHtml(texte) + trouHtml(question),
+  aide: () => texteHtml(texte) + phraseHtml(question.replace('…', bonne))
+});
+
+// L10 — Où couper ? CVC avec v et ch (4 choix ; les coupes fausses gardent toutes les lettres et ne coupent pas « ch »).
+const L10 = [
+  l2(1, 'mar-ch[e]', ['ma|rch[e]', 'm|arch[e]', 'm|a|rch[e]'], 'l10'),
+  l2(2, 'char-m[e]', ['cha|rm[e]', 'ch|arm[e]', 'ch|ar|m[e]'], 'l10'),
+  l2(3, 'four-ch[e]', ['fou|rch[e]', 'f|ourch[e]', 'f|our|ch[e]'], 'l10'),
+  l2(4, 'che-val', ['ch|eval', 'chev|al', 'che|v|al'], 'l10'),
+  l2(5, 'a-mi-ral', ['am|i|ral', 'a|mir|al', 'ami|r|al'], 'l10'),
+  l2(6, 'lar-v[e]', ['la|rv[e]', 'l|arv[e]', 'l|ar|v[e]'], 'l10'),
+  l2(7, 'mar-ché', ['ma|rché', 'm|arché', 'm|ar|ché'], 'l10'),
+  l2(8, 'fil-mé', ['fi|lmé', 'f|ilmé', 'film|é'], 'l10'),
+  l2(9, 'ar-ri-vé', ['a|rri|vé', 'arr|i|vé', 'ar|riv|é'], 'l10'),
+  l2(10, 'ral-lu-mé', ['ra|llu|mé', 'r|allu|mé', 'rall|u|mé'], 'l10'), // 31/10 : « chorvu » (se lit [kor]) puis « churmo » (voix douteuse) écartés
+  l6('l10', ['Léon a une armur[e].', 'Il a un cheval.', 'Le cheval fil[e] à la mar[e].', 'Ouf ! Léon est dans la mar[e] !'],
+    'Léon est dans la …', 'mar[e]', ['mall[e]', 'ruch[e]', 'mul[e]'], 2)
+];
+// L11 — Mots inventés entendus : u / ou, ar / ra, or / ro, syllabe fermée, avec v et ch.
+const L11 = [
+  l3(1, 'vur-mi', ['vour-mi', 'vu-mi', 'mi-vur'], 'l11'),
+  l3(2, 'chou-ra', ['chu-ra', 'ra-chou', 'chou-la'], 'l11'),
+  l3(3, 'mal-vo', ['ma-vo', 'mal-va', 'vo-mal'], 'l11'),
+  l3(4, 'ar-chu', ['ra-chu', 'a-chu', 'ar-chou'], 'l11'),
+  l3(5, 'fir-vé', ['fi-vé', 'vé-fir', 'fir-va'], 'l11'),
+  l3(6, 'chu-lir', ['chou-lir', 'chu-li', 'lir-chu'], 'l11'),
+  l3(7, 'or-fou', ['ro-fou', 'or-fu', 'o-fou'], 'l11'),
+  l3(8, 'vul-ra', ['vu-ra', 'vou-ra', 'ra-vul'], 'l11'),
+  l3(9, 'mour-chi', ['mur-chi', 'mou-chi', 'chi-mour'], 'l11'),
+  l3(10, 'ral-fu', ['lar-fu', 'ra-fu', 'ral-fou'], 'l11'),
+  l6('l11', ['Léon a un vélo.', 'Paola a mi[s] un chou sur le vélo.', 'Léon roul[e] sur le chou.', 'Le vélo chavir[e] !', 'Paola a ri.'],
+    'Paola a mi[s] un … sur le vélo.', 'chou', ['cha[t]', 'fil', 'lama'], 0)
+];
+// L12 — Phrases : sur ou dans ? (nouveau dessin), avec, des.
+const L12 = [
+  l5(1, 'Kali est dans la mall[e].', 'dans:koala', ['sur:koala', 'dans:panda', 'sur:panda'], 'l12'),
+  l5(2, 'Le lou[p] est sur la mall[e].', 'sur:loup', ['dans:loup', 'sur:lama', 'dans:lama'], 'l12'),
+  l5(3, 'La momi[e] est dans la mall[e].', 'dans:momie', ['sur:momie', 'dans:fee', 'sur:fee'], 'l12'),
+  l5(4, 'Il y a des moul[es] avec le lama.', 'groupe:lama+moule', ['duo:lama+moule', 'groupe:loup+moule', 'duo:loup+moule'], 'l12'),
+  l5(5, 'Mila est sur la mall[e] avec la fé[e].', 'sur:panda+fee', ['sur:panda', 'dans:panda', 'duo:panda+fee'], 'l12'),
+  l5(6, 'Le lama est dans la mall[e].', 'dans:lama', ['sur:lama', 'cote:lama', 'dans:loup'], 'l12'),
+  l5(7, 'Kali a des moul[es].', 'groupe:koala+moule', ['duo:koala+moule', 'groupe:panda+moule', 'seul:koala'], 'l12'),
+  l5(8, 'La fé[e] est sur la mall[e].', 'sur:fee', ['dans:fee', 'sur:momie', 'cote:fee'], 'l12'),
+  l5(9, 'Le lou[p] est là, avec la momi[e].', 'duo:loup+momie', ['duo:loup+fee', 'duo:lama+momie', 'seul:loup'], 'l12'),
+  l5(10, 'Kali est sur la mall[e].', 'sur:koala', ['dans:koala', 'cote:koala', 'sur:panda'], 'l12'),
+  l6('l12', ['Anna ram[e] sur la mar[e].', 'Léon est avec ell[e].', 'Il a vu un ra[t] sur la riv[e].', 'Léon chavir[e] !', 'Il est dans la mar[e].', 'Anna a ri.'],
+    'Léon a vu un … sur la riv[e].', 'ra[t]', ['cha[t]', 'lou[p]', 'lama'], 3)
+];
+
 export const PARCOURS_LECTURE = {
   code: 'L', titre: 'Le jeu des mots (lecture)',
   seances: [
@@ -339,7 +406,10 @@ export const PARCOURS_LECTURE = {
     { id: 'L6', objectif: 'Où couper ? Mots avec une syllabe consonne-voyelle-consonne (four-mi, lar-me)', items: L6 },
     { id: 'L7', objectif: 'Mots inventés : u ou « ou » ? « ar » ou « ra » ?', items: L7 },
     { id: 'L8', objectif: 'Construire un mot entendu (four ou fou ?) avec une syllabe en trop', items: L8 },
-    { id: 'L9', objectif: 'Lire une phrase avec sur, avec, c\'est, les, des, là', items: L9 }
+    { id: 'L9', objectif: 'Lire une phrase avec sur, avec, c\'est, les, des, là', items: L9 },
+    { id: 'L10', objectif: 'Où couper ? Syllabes consonne-voyelle-consonne, avec v et ch (mar-che, che-val)', items: L10 },
+    { id: 'L11', objectif: 'Mots inventés : u ou « ou », ar ou ra, avec v et ch', items: L11 },
+    { id: 'L12', objectif: 'Lire une phrase : sur ou dans ? avec, des', items: L12 }
   ]
 };
 export const ITEMS_LECTURE = PARCOURS_LECTURE.seances.flatMap(s => s.items);
@@ -350,9 +420,10 @@ export const REPERES_LECTURE = {
   'LEC-SYL': 'Découper un mot écrit en syllabes',
   'LEC-DEC': 'Déchiffrer un mot inconnu (mot inventé)',
   'LEC-ENC': 'Écrire un mot entendu avec des syllabes',
-  'LEC-PHR': 'Lire et comprendre une phrase courte'
+  'LEC-PHR': 'Lire et comprendre une phrase courte',
+  'LEC-TXT': 'Lire et comprendre un petit texte'
 };
-const REPERE_JEU = { l1: 'LEC-MOT', l2: 'LEC-SYL', l3: 'LEC-DEC', l4: 'LEC-ENC', l5: 'LEC-PHR' };
+const REPERE_JEU = { l1: 'LEC-MOT', l2: 'LEC-SYL', l3: 'LEC-DEC', l4: 'LEC-ENC', l5: 'LEC-PHR', l6: 'LEC-TXT' };
 export const repereLecture = itemId => {
   const it = ITEMS_LECTURE.find(x => x.id === itemId);
   return it ? REPERE_JEU[it.jeu] || null : null;
@@ -361,8 +432,8 @@ export const repereLecture = itemId => {
 // ---------- Page du manuel nécessaire ----------
 // Tous les textes que l'enfant doit lire dans un item (mot, phrase, mots proposés, coupes, tuiles).
 export function textesItem(it) {
-  return [it.mot, it.phrase, ...(it.tuiles || []),
-    ...(it.type === 'choixHtml' && ['l2', 'l3'].includes(it.jeu) ? it.choix.map(c => c.v.replace(/\|/g, '-')) : [])].filter(Boolean);
+  return [it.mot, it.phrase, ...(it.texte || []), it.question && it.question.replace('…', ' '), ...(it.tuiles || []),
+    ...(it.type === 'choixHtml' && ['l2', 'l3', 'l6'].includes(it.jeu) ? it.choix.map(c => c.v.replace(/\|/g, '-')) : [])].filter(Boolean);
 }
 // Première page du Calimot à partir de laquelle TOUTE la séance est déchiffrable (null : jamais).
 export function pageSeance(seance) {

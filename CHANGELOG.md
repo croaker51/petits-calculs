@@ -2,6 +2,12 @@
 
 Format : `version` — date — contenu. Version affichée dans l'espace parent et inscrite dans chaque export.
 
+## 0.4.2 — 2026-10-31
+- **Lecture : dessin « dans » corrigé.** L'ancien dessin (personnage posé sur une malle fermée) se confondait avec « sur » : un adulte s'y trompait aussi (signalé par Simon). « Dans » montre désormais une malle ouverte, couvercle relevé, le personnage sortant de l'intérieur ; « sur » reste un personnage posé sur la malle fermée. Concerne L5, L9 et L12. Les erreurs « sur / dans » de L9 jouées avant cette version ne mesurent pas la lecture.
+- **Lecture S1.7 : 3 nouvelles séances (30 items, 119 au total)**, déchiffrables à partir de la p. 27 du Calimot (v, ch) : L10 « Où couper ? » syllabes consonne-voyelle-consonne (marche, cheval, amiral, larve…) ; L11 mots inventés u / ou, ar / ra, or / ro avec v et ch ; L12 phrases « sur ou dans ? », avec, des. Contenu choisi d'après les séances L6-L9 des deux enfants.
+- **Petit texte en fin de séance (demande de Simon)** : une histoire de Léon, de plus en plus longue (L10 : 4 phrases, L11 : 5, L12 : 6), une phrase par ligne ; l'enfant lit puis touche le mot qui manque dans une question (texte toujours affiché). Prénoms Léon, Paola, Anna lus globalement comme Kali (la consigne orale les annonce, sans lire le texte). Nouveau repère « Lire et comprendre un petit texte ». 122 items de lecture.
+- Voix : 45 phrases en voix clonée, contrôlées par transcription ; prises tronquées régénérées et départagées automatiquement. L10, exercice 10 : mot inventé « chorvu » (se lit [kor]) puis « churmo » (prononciation douteuse) remplacés par « rallumé » ; son explication passe provisoirement par la voix de l'iPhone, en attendant la voix clonée.
+
 ## 0.4.1 — 2026-10-25
 - **Mises à jour plus rapides** : l'appli demande à chaque ouverture et à chaque retour au premier plan s'il existe une nouvelle version, et se recharge d'elle-même dès qu'elle l'a reçue, uniquement sur l'écran « Qui joue ? » ou l'accueil d'un enfant (jamais pendant le test, une séance ou l'espace parent). Constat : la 0.3.7 était encore utilisée 8 jours après la publication de la 0.3.8. Les données sont enregistrées avant le rechargement.
 
